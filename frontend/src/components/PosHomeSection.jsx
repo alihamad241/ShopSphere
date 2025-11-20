@@ -48,6 +48,7 @@ const PosHomeSection = () => {
                         </div>
                     </div>
                 </div>
+                
                 <div className="row">
                     <div className="single_p_active owl-carousel">
                         <div className="col-lg-3">
