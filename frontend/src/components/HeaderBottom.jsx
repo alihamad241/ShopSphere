@@ -2,16 +2,16 @@ import React from 'react'
 
 const HeaderBottom = () => {
     return (
-        <div class="header_bottom">
-            <div class="row">
-                <div class="col-12">
-                    <div class="main_menu_inner">
-                        <div class="main_menu d-none d-lg-block">
+        <div className="header_bottom">
+            <div className="row">
+                <div className="col-12">
+                    <div className="main_menu_inner">
+                        <div className="main_menu d-none d-lg-block">
                             <nav>
                                 <ul>
-                                    <li class="active"><a href="index.html">Home</a>
-                                        <div class="mega_menu jewelry">
-                                            <div class="mega_items jewelry">
+                                    <li className="active"><a href="index.html">Home</a>
+                                        <div className="mega_menu jewelry">
+                                            <div className="mega_items jewelry">
                                                 <ul>
                                                     <li><a href="index.html">Home 1</a></li>
                                                     <li><a href="index-2.html">Home 2</a></li>
@@ -20,8 +20,8 @@ const HeaderBottom = () => {
                                         </div>
                                     </li>
                                     <li><a href="shop.html">shop</a>
-                                        <div class="mega_menu jewelry">
-                                            <div class="mega_items jewelry">
+                                        <div className="mega_menu jewelry">
+                                            <div className="mega_items jewelry">
                                                 <ul>
                                                     <li><a href="shop-list.html">shop list</a></li>
                                                     <li><a href="shop-fullwidth.html">shop Full Width Grid</a></li>
@@ -37,9 +37,9 @@ const HeaderBottom = () => {
                                         </div>
                                     </li>
                                     <li><a href="#">women</a>
-                                        <div class="mega_menu">
-                                            <div class="mega_top fix">
-                                                <div class="mega_items">
+                                        <div className="mega_menu">
+                                            <div className="mega_top fix">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Accessories</a></h3>
                                                     <ul>
                                                         <li><a href="#">Cocktai</a></li>
@@ -50,7 +50,7 @@ const HeaderBottom = () => {
                                                         <li><a href="#">Sweets</a></li>
                                                     </ul>
                                                 </div>
-                                                <div class="mega_items">
+                                                <div className="mega_items">
                                                     <h3><a href="#">HandBags</a></h3>
                                                     <ul>
                                                         <li><a href="#">Accessories</a></li>
@@ -61,7 +61,7 @@ const HeaderBottom = () => {
                                                         <li><a href="#">Small Leathers</a></li>
                                                     </ul>
                                                 </div>
-                                                <div class="mega_items">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Tops</a></h3>
                                                     <ul>
                                                         <li><a href="#">Evening</a></li>
@@ -73,20 +73,20 @@ const HeaderBottom = () => {
                                                     </ul>
                                                 </div>
                                             </div>
-                                            <div class="mega_bottom fix">
-                                                <div class="mega_thumb">
-                                                    <a href="#"><img src="" alt=""/></a>
+                                            <div className="mega_bottom fix">
+                                                <div className="mega_thumb">
+                                                    <a href="#"><img src="../assets/img/placeholder.jpg" alt=""/></a>
                                                 </div>
-                                                <div class="mega_thumb">
-                                                    <a href="#"><img src="" alt=""/></a>
+                                                <div className="mega_thumb">
+                                                    <a href="#"><img src="../assets/img/placeholder.jpg" alt=""/></a>
                                                 </div>
                                             </div>
                                         </div>
                                     </li>
                                     <li><a href="#">men</a>
-                                        <div class="mega_menu">
-                                            <div class="mega_top fix">
-                                                <div class="mega_items">
+                                        <div className="mega_menu">
+                                            <div className="mega_top fix">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Rings</a></h3>
                                                     <ul>
                                                         <li><a href="#">Platinum Rings</a></li>
@@ -96,7 +96,7 @@ const HeaderBottom = () => {
                                                         <li><a href="#">Sweets</a></li>
                                                     </ul>
                                                 </div>
-                                                <div class="mega_items">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Bands</a></h3>
                                                     <ul>
                                                         <li><a href="#">Platinum Bands</a></li>
@@ -106,17 +106,17 @@ const HeaderBottom = () => {
                                                         <li><a href="#">Sweets</a></li>
                                                     </ul>
                                                 </div>
-                                                <div class="mega_items">
-                                                    <a href="#"><img src="" alt=""/></a>
+                                                <div className="mega_items">
+                                                    <a href="#"><img src="../assets/img/placeholder.jpg" alt=""/></a>
                                                 </div>
                                             </div>
 
                                         </div>
                                     </li>
                                     <li><a href="#">pages</a>
-                                        <div class="mega_menu">
-                                            <div class="mega_top fix">
-                                                <div class="mega_items">
+                                        <div className="mega_menu">
+                                            <div className="mega_top fix">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Column1</a></h3>
                                                     <ul>
                                                         <li><a href="portfolio.html">Portfolio</a></li>
@@ -127,7 +127,7 @@ const HeaderBottom = () => {
                                                         <li><a href="my-account.html">my account </a></li>
                                                     </ul>
                                                 </div>
-                                                <div class="mega_items">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Column2</a></h3>
                                                     <ul>
                                                         <li><a href="blog.html">Blog </a></li>
@@ -138,7 +138,7 @@ const HeaderBottom = () => {
                                                         <li><a href="404.html">404</a></li>
                                                     </ul>
                                                 </div>
-                                                <div class="mega_items">
+                                                <div className="mega_items">
                                                     <h3><a href="#">Column3</a></h3>
                                                     <ul>
                                                         <li><a href="contact.html">Contact</a></li>
@@ -153,8 +153,8 @@ const HeaderBottom = () => {
                                     </li>
 
                                     <li><a href="blog.html">blog</a>
-                                        <div class="mega_menu jewelry">
-                                            <div class="mega_items jewelry">
+                                        <div className="mega_menu jewelry">
+                                            <div className="mega_items jewelry">
                                                 <ul>
                                                     <li><a href="blog-details.html">blog details</a></li>
                                                     <li><a href="blog-fullwidth.html">blog fullwidth</a></li>
@@ -168,7 +168,7 @@ const HeaderBottom = () => {
                                 </ul>
                             </nav>
                         </div>
-                        <div class="mobile-menu d-lg-none">
+                        <div className="mobile-menu d-lg-none">
                             <nav>
                                 <ul>
                                     <li><a href="index.html">Home</a>
@@ -237,10 +237,10 @@ const HeaderBottom = () => {
                                             </div>
                                             <div>
                                                 <div>
-                                                    <a href="#"><img src="" alt="" /></a>
+                                                    <a href="#"><img src="../assets/img/placeholder.jpg" alt="" /></a>
                                                 </div>
                                                 <div>
-                                                    <a href="#"><img src="" alt="" /></a>
+                                                    <a href="#"><img src="../assets/img/placeholder.jpg" alt="" /></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -269,7 +269,7 @@ const HeaderBottom = () => {
                                                     </ul>
                                                 </div>
                                                 <div>
-                                                    <a href="#"><img src="" alt=""/></a>
+                                                    <a href="#"><img src="../assets/img/placeholder.jpg" alt=""/></a>
                                                 </div>
                                             </div>
 

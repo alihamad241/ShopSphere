@@ -2,20 +2,20 @@ import React from 'react'
 
 const HeaderTop = () => {
     return (
-        <div class="header_top">
-            <div class="row align-items-center">
-                <div class="col-lg-6 col-md-6">
-                    <div class="switcher">
+        <div className="header_top">
+            <div className="row align-items-center">
+                <div className="col-lg-6 col-md-6">
+                    <div className="switcher">
                         <ul>
-                            <li class="languages"><a href="#"> English <i class="fa fa-angle-down"></i></a>
-                                <ul class="dropdown_languages">
+                            <li className="languages"><a href="#"> English <i className="fa fa-angle-down"></i></a>
+                                <ul className="dropdown_languages">
                                     <li><a href="#"> English</a></li>   
                                     <li><a href="#"> French </a></li>
                                 </ul>
                             </li>
 
-                            <li class="currency"><a href="#"> Currency : $ <i class="fa fa-angle-down"></i></a>
-                                <ul class="dropdown_currency">
+                            <li className="currency"><a href="#"> Currency : $ <i className="fa fa-angle-down"></i></a>
+                                <ul className="dropdown_currency">
                                     <li><a href="#"> Dollar (USD)</a></li>
                                     <li><a href="#"> Euro (EUR)  </a></li>
                                 </ul>
@@ -23,8 +23,8 @@ const HeaderTop = () => {
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="header_links">
+                <div className="col-lg-6 col-md-6">
+                    <div className="header_links">
                         <ul>
                             <li><a href="contact.html" title="Contact">Contact</a></li>
                             <li><a href="wishlist.html" title="wishlist">My wishlist</a></li>

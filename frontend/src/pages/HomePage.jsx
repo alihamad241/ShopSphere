@@ -6,8 +6,8 @@ import PosHomeSection from '../components/PosHomeSection'
 const HomePage = () => {
     return (
         <div>
-            <div class="pos_page_inner">
-                <div class="header_area">
+            <div className="pos_page_inner">
+                <div className="header_area">
                     <HeaderTop />
                     <HeaderMiddle />
                     <HeaderBottom />
