@@ -4,7 +4,7 @@ import { FaFacebookF, FaTwitter, FaLinkedinIn, FaPinterestP } from "react-icons/
 const Social = () => {
   return (
     <div className="flex justify-center">
-      <div className="border w-full m-4 border-gray-300 p-4 text-center">
+      <div className="border w-full border-gray-300 p-4 text-center">
         <h4 className="font-bold mb-2 text-2xl">Share on:</h4>
         <ul className="flex gap-4 justify-center items-center">
           <li>
