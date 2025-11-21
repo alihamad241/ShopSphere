@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import MyAccountDashboard from "../components/MyAccountDashboard";
 
 export default function MyAccount() {
     return (
@@ -24,12 +25,9 @@ export default function MyAccount() {
                 </div>
             </div>
 
-            <div className="my_account_area">
-                <div className="mx-auto px-4">
-                    <h3>My Account</h3>
-                    <p>Account details and orders will be shown here.</p>
-                </div>
-            </div>
+            
+            <MyAccountDashboard />
+            
             <Footer />
         </>
     );
