@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCartStore } from "../stores/useCartStore";
+// import { useCartStore } from "../stores/useCartStore";
 
 const WishlistItem = ({item}) => {
 //  const { removeFromWishlist,addToCart } = useCartStore();
