@@ -25,7 +25,7 @@ const GiftCouponCard = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto border shadow-md bg-white">
+    <div className="w-full border shadow-md bg-white">
         <div className="bg-black text-white px-4 py-2 font-bold">
         COUPON
         </div>

@@ -13,29 +13,39 @@ const CartTotals = () => {
 	const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
 
 	const savings = subtotal - total;
+    const shipping=15;
+    const formattedShipping=shipping.toFixed(2);
 	const formattedSubtotal = subtotal.toFixed(2);
 	const formattedTotal = total.toFixed(2);
 	const formattedSavings = savings.toFixed(2);
 
-	const handlePayment = async () => {
-		const stripe = await stripePromise;
-		const res = await axios.post("/payments/create-checkout-session", {
-			products: cart,
-			couponCode: coupon ? coupon.code : null,
-		});
+	// const handlePayment = async () => {
+	// 	const stripe = await stripePromise;
+	// 	const res = await axios.post("/payments/create-checkout-session", {
+	// 		products: cart,
+	// 		couponCode: coupon ? coupon.code : null,
+	// 	});
+        const handlePayment = async () => {  // <-- async here
+  const stripe = await stripePromise; // await is allowed
+  const res = await axios.post("/payments/create-checkout-session", {
+    products: cart,
+    couponCode: coupon ? coupon.code : null,
+  });
 
-		const session = res.data;
-		const result = await stripe.redirectToCheckout({
-			sessionId: session.id,
-		});
+  const session = res.data;
 
-		if (result.error) {
-			console.error("Error:", result.error);
-		}
-	};
+  const result = await stripe.redirectToCheckout({
+    sessionId: session.id,
+  });
+
+  if (result.error) {
+    console.error(result.error);
+  }
+};
+
 
   return (
-    <div className="max-w-md mx-auto border shadow-md bg-white">
+    <div className="w-full border shadow-md bg-white">
       {/* Header */}
       <div className="bg-black text-white px-4 py-2 font-bold">
         CART TOTALS
