@@ -15,6 +15,7 @@ import ShopList from "./pages/ShopList.jsx";
 import ShopSidebar from "./pages/ShopSidebar.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
+import WishlistPage from "./pages/WishlistPage.jsx";
 import Blog from "./pages/Blog.jsx";
 import BlogDetails from "./pages/BlogDetails.jsx";
 import BlogFullwidth from "./pages/BlogFullwidth.jsx";
@@ -75,7 +76,7 @@ function App() {
                 />
                 <Route
                     path="/wishlist"
-                    element={<Wishlist />}
+                    element={<WishlistPage />}
                 />
                 <Route
                     path="/blog"

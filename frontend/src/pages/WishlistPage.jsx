@@ -4,10 +4,36 @@ import Social from "../components/Social";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const WishlistPage = () => {
-  const { wishlist } = useCartStore();
+  // const { wishlist } = useCartStore();
+  const wishlist= [
+    { _id: "1", name: "Handbag fringilla", price: 65, inStock: true, image: "/assets/img/cart/cart17.jpg" },
+    { _id: "2", name: "Handbags justo", price: 90, inStock: true, image: "/assets/img/cart/cart18.jpg" },
+    { _id: "3", name: "Handbags elit", price: 80, inStock: true, image: "/assets/img/cart/cart19.jpg" },
+  ];
   return (
+    <>
+    <Header />
+    <div className="breadcrumbs_area">
+                <div className="flex flex-wrap -mx-4">
+                    <div className="w-full">
+                        <div className="breadcrumb_content">
+                            <ul>
+                                <li>
+                                    <a href="/">home</a>
+                                </li>
+                                <li>
+                                    <i className="fa fa-angle-right"></i>
+                                </li>
+                                <li>Shopping Cart</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
     <div className="py-8 md:py-16">
       <div className="grid grid-cols-1 justify-items-center w-full max-w-7xl mx-auto gap-8">
         {wishlist.length === 0 ? (
@@ -43,6 +69,8 @@ const WishlistPage = () => {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 
@@ -62,7 +90,7 @@ const EmptyWishlistUI = () => (
       You haven’t added anything to your wishlist yet.
     </p>
     <Link
-      className="mt-4 rounded-md bg-[#00BBA6] px-6 py-2 text-white hover:bg-black transition-colors"
+      className="mt-4 rounded-md bg-[#00BBA6] px-6 py-2 text-white hover:bg-black transition-colors duration-200"
       to="/"
     >
       Browse Products

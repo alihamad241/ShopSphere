@@ -9,22 +9,22 @@ const Social = () => {
         <ul className="flex gap-4 justify-center items-center">
           <li>
             <a href="#" aria-label="Share">
-              <FaFacebookF className="w-5 h-5 text-[#333333] hover:text-red-500" />
+              <FaFacebookF className="w-5 h-5 text-[#333333] hover:text-red-500 transition-colors duration-200 cursor-pointer" />
             </a>
           </li>
           <li>
             <a href="#" aria-label="Share">
-              <FaTwitter className="w-5 h-5 text-[#333333] hover:text-red-500" />
+              <FaTwitter className="w-5 h-5 text-[#333333] hover:text-red-500 transition-colors duration-200 cursor-pointer" />
             </a>
           </li>
           <li>
             <a href="#" aria-label="Share">
-              <FaLinkedinIn className="w-5 h-5 text-[#333333] hover:text-red-500" />
+              <FaLinkedinIn className="w-5 h-5 text-[#333333] hover:text-red-500 transition-colors duration-200 cursor-pointer" />
             </a>
           </li>
           <li>
             <a href="#" aria-label="Share">
-              <FaPinterestP className="w-5 h-5 text-[#333333] hover:text-red-500" />
+              <FaPinterestP className="w-5 h-5 text-[#333333] hover:text-red-500 transition-colors duration-200 cursor-pointer" />
             </a>
           </li>
         </ul>
