@@ -94,7 +94,7 @@ const Contact = () => {
                                                     <button
                                                         type="submit"
                                                         onClick={handeSubmit}
-                                                        className="bg-blue-600 text-white px-4 py-2 rounded">
+                                                        className="bg-blue-600 text-black px-4 py-2 rounded">
                                                         Send Message
                                                     </button>
                                                 </div>
