@@ -1,43 +1,46 @@
 import React from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../components/Header"; // Assuming these exist
+import Footer from "../components/Footer"; // Assuming these exist
 import AboutContent from "../components/AboutContent";
 import CounterUp from "../components/CounterUp";
 import ProgressBar from "../components/ProgressBar";
 import BrandLogo from "../components/BrandLogo";
+import { ChevronRight, Home } from "lucide-react";
 
 export default function About() {
     return (
-        <>
+        <div className="font-sans text-gray-600">
             <Header />
-            <div className="breadcrumbs_area">
-                <div className="mx-auto px-4">
-                    <div className="flex flex-wrap -mx-4">
-                        <div className="w-full">
-                            <div className="breadcrumb_content">
-                                <ul>
-                                    <li>
-                                        <a href="/">home</a>
-                                    </li>
-                                    <li>
-                                        <i className="fa fa-angle-right"></i>
-                                    </li>
-                                    <li>about us</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+
+            {/* --- Breadcrumbs Area --- */}
+            <div className="bg-gray-100 py-5 border-b border-gray-200">
+                <div className="container mx-auto px-4">
+                    <ul className="flex items-center gap-2 text-sm font-medium uppercase text-gray-500">
+                        <li>
+                            <a
+                                href="/"
+                                className="flex items-center hover:text-[#00bba6] transition-colors">
+                                <Home size={14} className="mr-1" /> Home
+                            </a>
+                        </li>
+                        <li>
+                            <ChevronRight size={14} />
+                        </li>
+                        <li className="text-[#00bba6]">About Us</li>
+                    </ul>
                 </div>
             </div>
+            {/* --- End Breadcrumbs --- */}
 
-            <AboutContent />
-            <CounterUp />
-            <ProgressBar />
-            <BrandLogo
-                className={"brand_about"}
-                title={"Brands"}
-            />
+            {/* Page Components */}
+            <div className="space-y-20 py-16">
+                <AboutContent />
+                <CounterUp />
+                <ProgressBar />
+                <BrandLogo />
+            </div>
+
             <Footer />
-        </>
+        </div>
     );
 }

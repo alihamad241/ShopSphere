@@ -27,25 +27,25 @@ const Header = () => {
                 <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
                     <div className="flex space-x-6 mb-2 md:mb-0">
                         {/* Language */}
-                        <div className="relative group cursor-pointer flex items-center gap-1 hover:text-blue-500">
+                        <div className="relative group cursor-pointer flex items-center gap-1 hover:text-[#00bba6]">
                             <span>English</span> <ChevronDown size={12} />
                             <div className="absolute top-full left-0 bg-white shadow-md py-2 px-4 hidden group-hover:block z-50 min-w-[100px] border">
-                                <div className="hover:text-blue-500 py-1">
+                                <div className="hover:text-[#00bba6] py-1">
                                     English
                                 </div>
-                                <div className="hover:text-blue-500 py-1">
+                                <div className="hover:text-[#00bba6] py-1">
                                     French
                                 </div>
                             </div>
                         </div>
                         {/* Currency */}
-                        <div className="relative group cursor-pointer flex items-center gap-1 hover:text-blue-500">
+                        <div className="relative group cursor-pointer flex items-center gap-1 hover:text-[#00bba6]">
                             <span>Currency : $</span> <ChevronDown size={12} />
                             <div className="absolute top-full left-0 bg-white shadow-md py-2 px-4 hidden group-hover:block z-50 min-w-[100px] border">
-                                <div className="hover:text-blue-500 py-1">
+                                <div className="hover:text-[#00bba6] py-1">
                                     Dollar (USD)
                                 </div>
-                                <div className="hover:text-blue-500 py-1">
+                                <div className="hover:text-[#00bba6] py-1">
                                     Euro (EUR)
                                 </div>
                             </div>
@@ -54,16 +54,16 @@ const Header = () => {
 
                     {/* Right Links */}
                     <div className="flex space-x-4 text-xs md:text-sm uppercase tracking-wide">
-                        <a href="#" className="hover:text-blue-500">
+                        <a href="#" className="hover:text-[#00bba6]">
                             Contact
                         </a>
-                        <a href="#" className="hover:text-blue-500">
+                        <a href="#" className="hover:text-[#00bba6]">
                             Wishlist
                         </a>
-                        <a href="#" className="hover:text-blue-500">
+                        <a href="#" className="hover:text-[#00bba6]">
                             My Account
                         </a>
-                        <a href="#" className="hover:text-blue-500">
+                        <a href="#" className="hover:text-[#00bba6]">
                             Login
                         </a>
                     </div>
@@ -87,7 +87,7 @@ const Header = () => {
                             <input
                                 type="text"
                                 placeholder="Search..."
-                                className="w-full border border-gray-300 pl-4 pr-10 py-2 rounded-sm focus:outline-none focus:border-blue-500"
+                                className="w-full border border-gray-300 pl-4 pr-10 py-2 rounded-sm focus:outline-none focus:border-[#00bba6]"
                             />
                             <button className="absolute right-0 top-0 h-full px-4 text-gray-500 hover:text-blue-500">
                                 <Search size={18} />
@@ -98,7 +98,7 @@ const Header = () => {
                         <div className="relative group">
                             <a
                                 href="#"
-                                className="flex items-center gap-2 font-medium hover:text-blue-500">
+                                className="flex items-center gap-2 font-medium hover:text-[#00bba6]">
                                 <ShoppingCart size={20} />
                                 <span>2 Items - $209.44</span>
                                 <ChevronDown size={14} />
@@ -111,7 +111,7 @@ const Header = () => {
                                     <div>
                                         <a
                                             href="#"
-                                            className="font-medium hover:text-blue-500">
+                                            className="font-medium hover:text-[#00bba6]">
                                             Sample Product
                                         </a>
                                         <div className="text-sm text-gray-500">
@@ -126,7 +126,7 @@ const Header = () => {
                                     <span>Total:</span>
                                     <span>$227.00</span>
                                 </div>
-                                <button className="w-full bg-gray-800 text-white py-2 hover:bg-blue-500 transition">
+                                <button className="w-full bg-gray-800 text-white py-2 hover:bg-[#00bba6] transition">
                                     CHECKOUT
                                 </button>
                             </div>
@@ -142,23 +142,23 @@ const Header = () => {
                     <nav className="hidden lg:block">
                         <ul className="flex space-x-8 text-sm font-bold uppercase tracking-wider">
                             <li className="group relative py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Home
                                 </a>
                                 {/* Dropdown Example */}
-                                <div className="absolute top-full left-0 bg-white text-gray-600 shadow-lg p-4 w-48 hidden group-hover:block z-40 border-t-2 border-blue-500">
+                                <div className="absolute top-full left-0 bg-white text-gray-600 shadow-lg p-4 w-48 hidden group-hover:block z-40 border-t-2 border-[#00bba6]">
                                     <ul className="space-y-2 font-normal normal-case">
                                         <li>
                                             <a
                                                 href="#"
-                                                className="hover:text-blue-500">
+                                                className="hover:text-[#00bba6]">
                                                 Home Version 1
                                             </a>
                                         </li>
                                         <li>
                                             <a
                                                 href="#"
-                                                className="hover:text-blue-500">
+                                                className="hover:text-[#00bba6]">
                                                 Home Version 2
                                             </a>
                                         </li>
@@ -166,32 +166,32 @@ const Header = () => {
                                 </div>
                             </li>
                             <li className="py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Shop
                                 </a>
                             </li>
                             <li className="py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Women
                                 </a>
                             </li>
                             <li className="py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Men
                                 </a>
                             </li>
                             <li className="py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Pages
                                 </a>
                             </li>
                             <li className="py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Blog
                                 </a>
                             </li>
                             <li className="py-4">
-                                <a href="#" className="hover:text-blue-400">
+                                <a href="#" className="hover:text-[#00bba6]">
                                     Contact
                                 </a>
                             </li>
