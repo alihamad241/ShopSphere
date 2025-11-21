@@ -1,4 +1,4 @@
-import { useCartStore } from "../stores/useCartStore";
+// import { useCartStore } from "../stores/useCartStore";
 import WishlistItem from "../components/WishlistItem";
 import Social from "../components/Social";
 import { motion } from "framer-motion";

@@ -1,37 +1,58 @@
 import React from "react";
 
+const counters = [
+    {
+        id: 1,
+        img: "/assets/img/cart/count.png",
+        number: "2170",
+        title: "Happy Customers",
+    },
+    {
+        id: 2,
+        img: "/assets/img/cart/count2.png",
+        number: "8080",
+        title: "Awards Won",
+    },
+    {
+        id: 3,
+        img: "/assets/img/cart/count3.png",
+        number: "2150",
+        title: "Hours Worked",
+    },
+    {
+        id: 4,
+        img: "/assets/img/cart/cart5.png",
+        number: "2170",
+        title: "Complete Projects",
+    },
+];
+
 export default function CounterUp() {
-    const counters = [
-        { img: "/assets/img/cart/count.png", num: "2170", label: "happy customers" },
-        { img: "/assets/img/cart/count2.png", num: "8080", label: "AWARDS won" },
-        { img: "/assets/img/cart/count3.png", num: "2150", label: "HOURS WORKED" },
-        { img: "/assets/img/cart/cart5.png", num: "2170", label: "COMPLETE PROJECTS" },
-    ];
     return (
-        <div className="counterup_section py-8">
-            <div className="mx-auto px-4">
-                <div className="flex flex-wrap -mx-4">
-                    {counters.map((c, i) => (
+        <section className="bg-gray-50 py-16">
+            <div className="container mx-auto px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    {counters.map((item) => (
                         <div
-                            className="w-full md:w-1/2 lg:w-1/4 px-2"
-                            key={i}>
-                            <div className={`single_counterup ${i % 2 ? "count-two" : ""} bg-white rounded shadow-sm p-6 text-center`}>
-                                <div className="counter_img mb-3">
-                                    <img
-                                        src={c.img}
-                                        alt=""
-                                        className="mx-auto h-12 object-contain"
-                                    />
-                                </div>
-                                <div className="counter_info">
-                                    <h2 className="counter_number text-3xl font-bold">{c.num}</h2>
-                                    <p className="text-sm text-gray-600 mt-1">{c.label}</p>
-                                </div>
+                            key={item.id}
+                            className="flex flex-col items-center group">
+                            <div className="mb-4 p-4 rounded-full bg-white shadow-sm group-hover:shadow-md transition-shadow">
+                                <img
+                                    src={item.img}
+                                    alt={item.title}
+                                    className="w-10 h-10 object-contain"
+                                />
                             </div>
+                            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                                {item.number}
+                            </h2>
+                            <p className="text-sm uppercase font-medium text-gray-500 tracking-wide">
+                                {item.title}
+                            </p>
                         </div>
                     ))}
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

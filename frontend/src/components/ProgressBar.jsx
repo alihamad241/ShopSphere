@@ -1,62 +1,47 @@
 import React from "react";
 
-function ProgressSkill({ label, percent }) {
-    return (
-        <div className="progress_skill mb-4">
-            <div className="progress bg-gray-200 rounded h-4 overflow-hidden">
-                <div
-                    className="progress-bar about_prog bg-blue-600 h-4"
-                    role="progressbar"
-                    style={{ width: percent }}
-                    aria-valuenow={parseInt(percent)}
-                    aria-valuemin="0"
-                    aria-valuemax="100"></div>
-            </div>
-            <div className="flex items-center justify-between mt-2 text-sm text-gray-700">
-                <span className="progress_persent font-medium">{label}</span>
-                <span className="progress_discount">{percent}</span>
-            </div>
+const SkillItem = ({ title, percentage }) => (
+    <div className="mb-6 relative">
+        <div className="flex justify-between mb-2 text-sm font-bold uppercase text-gray-700">
+            <span>{title}</span>
+            <span>{percentage}%</span>
         </div>
-    );
-}
+        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+            <div
+                className="h-full rounded-full transition-all duration-1000 ease-out bg-[#00bba6]"
+                style={{ width: `${percentage}%` }}></div>
+        </div>
+    </div>
+);
 
 export default function ProgressBar() {
     return (
-        <div className="about_progressbar py-8">
-            <div className="mx-auto px-4">
-                <div className="flex items-center">
-                    <div className="w-full md:w-1/2 lg:w-1/2">
-                        <div className="progressbar_inner">
-                            <h2 className="text-2xl font-bold mb-4">We have Skills to show</h2>
-                            <ProgressSkill
-                                label="HTML/CSS"
-                                percent={"60%"}
-                            />
-                            <ProgressSkill
-                                label="WORDPRESS THEME"
-                                percent={"90%"}
-                            />
-                            <ProgressSkill
-                                label="Typhography"
-                                percent={"70%"}
-                            />
-                            <ProgressSkill
-                                label="Branding"
-                                percent={"80%"}
-                            />
-                        </div>
+        <section className="container mx-auto px-4">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+                {/* Left: Progress Bars */}
+                <div className="w-full lg:w-1/2">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-8 uppercase">
+                        We have Skills to show
+                    </h2>
+                    <div className="pr-0 lg:pr-8">
+                        <SkillItem title="HTML/CSS" percentage={60} />
+                        <SkillItem title="Wordpress Theme" percentage={90} />
+                        <SkillItem title="Typography" percentage={70} />
+                        <SkillItem title="Branding" percentage={80} />
                     </div>
-                    <div className="w-full md:w-1/2 lg:w-1/2 mt-6 md:mt-0">
-                        <div className="about__img">
-                            <img
-                                src="/assets/img/ship/about3.jpg"
-                                alt=""
-                                className="w-full rounded shadow-sm object-cover"
-                            />
-                        </div>
+                </div>
+
+                {/* Right: Image */}
+                <div className="w-full lg:w-1/2">
+                    <div className="rounded-sm overflow-hidden">
+                        <img
+                            src="/assets/img/ship/about3.jpg"
+                            alt="Skills"
+                            className="w-full h-auto object-cover"
+                        />
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }
