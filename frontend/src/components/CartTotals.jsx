@@ -77,7 +77,7 @@ const CartTotals = () => {
 
         {/* Checkout button */}
         <div className="text-right">
-        <button className="px-4 inline-block bg-[#00BBA6] text-white py-2 font-bold hover:bg-red-500 cursor-pointer">
+        <button className="px-4 inline-block bg-[#00BBA6] text-white py-2 font-bold hover:bg-red-500 cursor-pointer transition-colors duration-200">
           PROCEED TO CHECKOUT
         </button>
         </div>

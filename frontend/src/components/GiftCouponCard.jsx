@@ -4,23 +4,26 @@ import { useCartStore } from "../stores/useCartStore";
 
 const GiftCouponCard = () => {
   const [userInputCode, setUserInputCode] = useState("");
-  const { coupon, isCouponApplied, applyCoupon, getMyCoupon, removeCoupon } = useCartStore();
+  // const { coupon, isCouponApplied, applyCoupon, getMyCoupon, removeCoupon } = useCartStore();
 
-    useEffect(() => {
-  getMyCoupon();
-}, [getMyCoupon]);
-
+//     useEffect(() => {
+//   getMyCoupon();
+// }, [getMyCoupon]);
+      const coupon = { code: "TEST10", discountPercentage: 10 };
+      const [isCouponApplied, setIsCouponApplied] = useState(false);
       useEffect(() => {
     if (coupon) setUserInputCode(coupon.code);
   }, [coupon]);
 
   const handleApplyCoupon = () => {
     if (!userInputCode) return;
-    applyCoupon(userInputCode);
+    // applyCoupon(userInputCode);
+     setIsCouponApplied(true);
   };
 
   const handleRemoveCoupon = async () => {
-    await removeCoupon();
+    // await removeCoupon();
+    setIsCouponApplied(false);
     setUserInputCode("");
   };
 
@@ -44,7 +47,7 @@ const GiftCouponCard = () => {
     />
 
     <button
-    className="px-4 py-2 bg-black text-white font-bold hover:bg-[#00BBA6]"
+    className="px-4 py-2 bg-black text-white font-bold hover:bg-[#00BBA6] cursor-pointer transition-colors duration-200"
     onClick={handleApplyCoupon}
   >
     APPLY COUPON

@@ -4,6 +4,7 @@ import About from "./pages/About.jsx";
 import SingleProduct from "./pages/SingleProduct.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Login from "./pages/Login.jsx";
+import CartPage from "./pages/CartPage.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import Contact from "./pages/Contact.jsx";
@@ -38,7 +39,7 @@ function App() {
                 />
                 <Route
                     path="/cart"
-                    element={<Cart />}
+                    element={<CartPage />}
                 />
                 <Route
                     path="/checkout"

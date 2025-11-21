@@ -5,11 +5,36 @@ import { ShoppingCart } from "lucide-react";
 import CartItem from "../components/CartItem";
 import GiftCouponCard from "../components/GiftCouponCard";
 import CartTotals from "../components/CartTotals";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const CartPage = () => {
-  const { cart } = useCartStore();
-
+  // const { cart } = useCartStore();
+  const cart= [
+    { _id: "1", name: "Handbag fringilla", price: 65, quantity: 2, image: "/assets/img/cart/cart17.jpg" },
+    { _id: "2", name: "Handbags justo", price: 90, quantity: 1, image: "/assets/img/cart/cart18.jpg" },
+    { _id: "3", name: "Handbags elit", price: 80, quantity: 2, image: "/assets/img/cart/cart19.jpg" },
+  ];
   return (
+    <>
+    <Header />
+    <div className="breadcrumbs_area">
+                <div className="flex flex-wrap -mx-4">
+                    <div className="w-full">
+                        <div className="breadcrumb_content">
+                            <ul>
+                                <li>
+                                    <a href="/">home</a>
+                                </li>
+                                <li>
+                                    <i className="fa fa-angle-right"></i>
+                                </li>
+                                <li>Shopping Cart</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
     <div className="py-8 md:py-16">
       <div className="mx-auto max-w-7xl px-4 2xl:px-0 space-y-8">
         {cart.length === 0 ? (
@@ -21,12 +46,12 @@ const CartPage = () => {
               <table className="w-full text-center border border-gray-200 border-collapse">
                 <thead className="text-[#5B5B5B] border-b-4 border-b-[#00BBA6]">
                   <tr>
-                    <th className="py-3">DELETE</th>
-                    <th className="py-3">IMAGE</th>
-                    <th className="py-3">PRODUCT</th>
-                    <th className="py-3">PRICE</th>
-                    <th className="py-3">QUANTITY</th>
-                    <th className="py-3">TOTAL</th>
+                    <th className="py-4">DELETE</th>
+                    <th className="py-4">IMAGE</th>
+                    <th className="py-4">PRODUCT</th>
+                    <th className="py-4">PRICE</th>
+                    <th className="py-4">QUANTITY</th>
+                    <th className="py-4">TOTAL</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -37,7 +62,7 @@ const CartPage = () => {
               </table>
 
               <div className="flex justify-end mt-4 w-full">
-                <button className="px-6 py-2 hover:bg-[#00BBA6] text-white font-bold bg-black">
+                <button className="px-6 py-2 hover:bg-[#00BBA6] text-white font-bold bg-black cursor-pointer transition-colors duration-200">
                   UPDATE CART
                 </button>
               </div>
@@ -52,6 +77,8 @@ const CartPage = () => {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

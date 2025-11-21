@@ -15,12 +15,12 @@ const CartItem = ({ item }) => {
     <tr className="border border-gray-200 text-center font-bold">
       <td className="px-4 py-2 border-r border-gray-200">
         <button onClick={() => removeFromCart(item._id)}>
-          <Trash className="text-[#00BBA6] w-5 h-5 hover:text-red-500" />
+          <Trash className="text-[#00BBA6] w-5 h-5 hover:text-red-500 transition-colors duration-200 cursor-pointer" />
         </button>
       </td>
       <td className="px-4 py-2 border-r border-gray-200">
         <img
-          src={item.image || "assets/img/cart/cart17.jpg"}
+          src={item.image || "/assets/img/cart/cart17.jpg"}
           alt={item.name}
           className="w-16 h-16 object-cover mx-auto"
         />
@@ -33,7 +33,7 @@ const CartItem = ({ item }) => {
           min="1"
           value={item.quantity}
           onChange={handleQuantityChange}
-          className="w-16 text-center border border-gray-300 font-light"
+          className="w-20 md:w-24 text-center border border-gray-300 font-medium px-2 py-1"
         />
       </td>
       <td className="px-4 py-2 text-[#00BBA6]">
