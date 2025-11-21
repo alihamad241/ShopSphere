@@ -100,7 +100,7 @@ export default function Faq() {
                                         <span className="font-semibold text-sm md:text-base uppercase tracking-wide">
                                             {item.question}
                                         </span>
-                                        <span className="ml-4 flex-shrink-0">
+                                        <span className="ml-4 shrink-0">
                                             {activeId === item.id ? (
                                                 <Minus size={16} />
                                             ) : (
