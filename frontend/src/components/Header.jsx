@@ -1,7 +1,30 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Header() {
+    const [selectedLang, setSelectedLang] = useState("en");
+    const [langOpen, setLangOpen] = useState(false);
+    const [currencyOpen, setCurrencyOpen] = useState(false);
+    const [selectedCurrency, setSelectedCurrency] = useState("usd");
+    const langRef = useRef(null);
+    const currencyRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (langRef.current && !langRef.current.contains(e.target)) {
+                setLangOpen(false);
+            }
+            if (
+                currencyRef.current &&
+                !currencyRef.current.contains(e.target)
+            ) {
+                setCurrencyOpen(false);
+            }
+        }
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
+
     return (
         <header>
             <div className="bg-white">
@@ -11,46 +34,150 @@ export default function Header() {
                             <div className="lg:w-1/2 w-full px-4">
                                 <div className="switcher">
                                     <ul>
-                                        <li className="languages">
-                                            <a href="#">
+                                        <li
+                                            className="languages mr-4"
+                                            ref={langRef}
+                                            onClick={(e) => {
+                                                if (
+                                                    e.target.closest(
+                                                        ".dropdown_languages"
+                                                    )
+                                                )
+                                                    return;
+                                                e.preventDefault();
+                                                setLangOpen((v) => !v);
+                                                setCurrencyOpen(false);
+                                            }}>
+                                            <a
+                                                href="#"
+                                                className="inline-flex items-center"
+                                                style={{ width: "auto" }}>
                                                 <img
-                                                    src="/assets/img/logo/fontlogo.jpg"
+                                                    src={
+                                                        selectedLang === "fr"
+                                                            ? "/assets/img/logo/fontlogo2.jpg"
+                                                            : "/assets/img/logo/fontlogo.jpg"
+                                                    }
                                                     alt=""
-                                                />{" "}
-                                                English <i className="fa fa-angle-down"></i>
+                                                    className="inline-block mr-2 h-4 w-4 object-cover"
+                                                />
+                                                <span className="mr-2">
+                                                    {selectedLang === "fr"
+                                                        ? "French"
+                                                        : "English"}
+                                                </span>
+                                                <i className="fa fa-angle-down"></i>
                                             </a>
-                                            <ul className="dropdown_languages">
+
+                                            <ul
+                                                className={
+                                                    "dropdown_languages" +
+                                                    (langOpen ? " open" : "")
+                                                }>
                                                 <li>
-                                                    <a href="#">
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedLang(
+                                                                "en"
+                                                            );
+                                                            setLangOpen(false);
+                                                        }}>
                                                         <img
                                                             src="/assets/img/logo/fontlogo.jpg"
-                                                            alt=""
-                                                        />{" "}
+                                                            alt="English"
+                                                            className="inline-block mr-2 h-4 w-4 object-cover"
+                                                        />
                                                         English
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedLang(
+                                                                "fr"
+                                                            );
+                                                            setLangOpen(false);
+                                                        }}>
                                                         <img
                                                             src="/assets/img/logo/fontlogo2.jpg"
-                                                            alt=""
-                                                        />{" "}
-                                                        French{" "}
+                                                            alt="French"
+                                                            className="inline-block mr-2 h-4 w-4 object-cover"
+                                                        />
+                                                        French
                                                     </a>
                                                 </li>
                                             </ul>
                                         </li>
-                                        <li className="currency">
-                                            <a href="#">
-                                                {" "}
-                                                Currency : $ <i className="fa fa-angle-down"></i>
+
+                                        <li
+                                            className="currency"
+                                            ref={currencyRef}
+                                            onClick={(e) => {
+                                                if (
+                                                    e.target.closest(
+                                                        ".dropdown_currency"
+                                                    )
+                                                )
+                                                    return;
+                                                e.preventDefault();
+                                                setCurrencyOpen((v) => !v);
+                                                setLangOpen(false);
+                                            }}>
+                                            <a
+                                                href="#"
+                                                className="inline-flex items-center"
+                                                style={{ width: "auto" }}>
+                                                <span className="mr-2">
+                                                    Currency :
+                                                </span>
+                                                <span className="font-semibold mr-2">
+                                                    {selectedCurrency === "eur"
+                                                        ? "€"
+                                                        : "$"}
+                                                </span>
+                                                <i className="fa fa-angle-down ml-2"></i>
                                             </a>
-                                            <ul className="dropdown_currency">
+
+                                            <ul
+                                                className={
+                                                    "dropdown_currency" +
+                                                    (currencyOpen
+                                                        ? " open"
+                                                        : "")
+                                                }>
                                                 <li>
-                                                    <a href="#"> Dollar (USD)</a>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedCurrency(
+                                                                "usd"
+                                                            );
+                                                            setCurrencyOpen(
+                                                                false
+                                                            );
+                                                        }}>
+                                                        Dollar (USD)
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#"> Euro (EUR) </a>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedCurrency(
+                                                                "eur"
+                                                            );
+                                                            setCurrencyOpen(
+                                                                false
+                                                            );
+                                                        }}>
+                                                        Euro (EUR)
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -61,9 +188,7 @@ export default function Header() {
                                 <div className="header_links text-right">
                                     <ul>
                                         <li>
-                                            <Link
-                                                to="/contact"
-                                                title="Contact">
+                                            <Link to="/contact" title="Contact">
                                                 Contact
                                             </Link>
                                         </li>
@@ -82,16 +207,12 @@ export default function Header() {
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link
-                                                to="/cart"
-                                                title="My cart">
+                                            <Link to="/cart" title="My cart">
                                                 My cart
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link
-                                                to="/login"
-                                                title="Login">
+                                            <Link to="/login" title="Login">
                                                 Login
                                             </Link>
                                         </li>
@@ -118,9 +239,7 @@ export default function Header() {
                             <div className="lg:w-3/4 md:w-3/4 w-full px-4">
                                 <div className="header_right_info">
                                     <div className="search_bar">
-                                        <form
-                                            action="#"
-                                            className="flex">
+                                        <form action="#" className="flex">
                                             <input
                                                 placeholder="Search..."
                                                 type="text"
@@ -137,7 +256,9 @@ export default function Header() {
                                         <Link
                                             to="/cart"
                                             className="inline-flex items-center text-gray-800">
-                                            <i className="fa fa-shopping-cart mr-2"></i> 2Items - $209.44 <i className="fa fa-angle-down ml-2"></i>
+                                            <i className="fa fa-shopping-cart mr-2"></i>{" "}
+                                            2Items - $209.44{" "}
+                                            <i className="fa fa-angle-down ml-2"></i>
                                         </Link>
                                     </div>
                                 </div>
@@ -153,33 +274,66 @@ export default function Header() {
                                 <div className="main_menu_inner">
                                     <div className="main_menu hidden lg:block">
                                         <nav>
-                                            <ul>
+                                            <ul className="flex items-center">
                                                 <li className="active">
-                                                    <Link to="/">Home</Link>
+                                                    <Link
+                                                        to="/"
+                                                        className="text-white text-lg px-6 py-2">
+                                                        HOME
+                                                    </Link>
                                                 </li>
                                                 <li>
                                                     <div className="mega_menu_link">
-                                                        <Link to="/shop">shop</Link>
+                                                        <Link
+                                                            to="/shop"
+                                                            className="text-white hover:text-white focus:text-white active:text-white text-lg px-6 py-2">
+                                                            SHOP
+                                                        </Link>
                                                         <div className="mega_menu">
                                                             <div className="mega_items">
                                                                 <ul>
                                                                     <li>
-                                                                        <Link to="/shop/list">shop list</Link>
+                                                                        <Link to="/shop/list">
+                                                                            shop
+                                                                            list
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/fullwidth">shop Full Width Grid</Link>
+                                                                        <Link to="/shop/fullwidth">
+                                                                            shop
+                                                                            Full
+                                                                            Width
+                                                                            Grid
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/fullwidth">shop Full Width list</Link>
+                                                                        <Link to="/shop/fullwidth">
+                                                                            shop
+                                                                            Full
+                                                                            Width
+                                                                            list
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/sidebar">shop Right Sidebar</Link>
+                                                                        <Link to="/shop/sidebar">
+                                                                            shop
+                                                                            Right
+                                                                            Sidebar
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/sidebar">shop list Right Sidebar</Link>
+                                                                        <Link to="/shop/sidebar">
+                                                                            shop
+                                                                            list
+                                                                            Right
+                                                                            Sidebar
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/product">Product Details</Link>
+                                                                        <Link to="/product">
+                                                                            Product
+                                                                            Details
+                                                                        </Link>
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -187,28 +341,51 @@ export default function Header() {
                                                     </div>
                                                 </li>
                                                 <li>
-                                                    <a href="#">women</a>
+                                                    <a
+                                                        href="#"
+                                                        className="text-white text-lg px-6 py-2">
+                                                        WOMEN
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">men</a>
+                                                    <a
+                                                        href="#"
+                                                        className="text-white text-lg px-6 py-2">
+                                                        MEN
+                                                    </a>
                                                 </li>
                                                 <li>
                                                     <div className="mega_menu_link">
-                                                        <a href="#">pages</a>
+                                                        <a
+                                                            href="#"
+                                                            className="text-white hover:text-white focus:text-white active:text-white text-lg px-6 py-2">
+                                                            PAGES
+                                                        </a>
                                                         <div className="mega_menu">
                                                             <div className="mega_items">
                                                                 <ul>
                                                                     <li>
-                                                                        <Link to="/about">About Us</Link>
+                                                                        <Link to="/about">
+                                                                            About
+                                                                            Us
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/my-account">my account</Link>
+                                                                        <Link to="/my-account">
+                                                                            my
+                                                                            account
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/faq">Frequently Questions</Link>
+                                                                        <Link to="/faq">
+                                                                            Frequently
+                                                                            Questions
+                                                                        </Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/404">404</Link>
+                                                                        <Link to="/404">
+                                                                            404
+                                                                        </Link>
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -216,7 +393,11 @@ export default function Header() {
                                                     </div>
                                                 </li>
                                                 <li>
-                                                    <Link to="/contact">contact us</Link>
+                                                    <Link
+                                                        to="/contact"
+                                                        className="text-white text-lg px-6 py-2">
+                                                        CONTACT US
+                                                    </Link>
                                                 </li>
                                             </ul>
                                         </nav>
