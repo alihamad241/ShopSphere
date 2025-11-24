@@ -7,10 +7,16 @@ const productSchema = new mongoose.Schema(
         price: { type: Number, required: true },
         image: { type: String, required: [true, 'Image is required'] },
         category: { type: String, required: true },
-        isFeatured: { type: Boolean, default: false }
+        isFeatured: { type: Boolean, default: false },
+        store: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Store',
+            required: true
+        }
     },
     { timestamps: true }
 );
+
 
 const Product = mongoose.model('Product', productSchema);
 
