@@ -14,13 +14,7 @@ import ShopFullwidth from "./pages/ShopFullwidth.jsx";
 import ShopList from "./pages/ShopList.jsx";
 import ShopSidebar from "./pages/ShopSidebar.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
-import Wishlist from "./pages/Wishlist.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
-import Blog from "./pages/Blog.jsx";
-import BlogDetails from "./pages/BlogDetails.jsx";
-import BlogFullwidth from "./pages/BlogFullwidth.jsx";
-import BlogSidebar from "./pages/BlogSidebar.jsx";
-import Portfolio from "./pages/Portfolio.jsx";
 
 function App() {
     return (
@@ -77,26 +71,6 @@ function App() {
                 <Route
                     path="/wishlist"
                     element={<WishlistPage />}
-                />
-                <Route
-                    path="/blog"
-                    element={<Blog />}
-                />
-                <Route
-                    path="/blog/details"
-                    element={<BlogDetails />}
-                />
-                <Route
-                    path="/blog/fullwidth"
-                    element={<BlogFullwidth />}
-                />
-                <Route
-                    path="/blog/sidebar"
-                    element={<BlogSidebar />}
-                />
-                <Route
-                    path="/portfolio"
-                    element={<Portfolio />}
                 />
                 <Route
                     path="/login"

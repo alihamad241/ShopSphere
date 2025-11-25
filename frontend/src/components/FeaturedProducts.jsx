@@ -1,4 +1,6 @@
 import React from "react";
+import ProductCard from "./ProductCard";
+import Carousel from "./Carousel";
 
 export default function FeaturedProducts() {
     const items = [
@@ -18,36 +20,23 @@ export default function FeaturedProducts() {
                     </div>
                 </div>
                 <div className="flex flex-wrap -mx-4">
-                    <div className="single_p_active owl-carousel flex gap-4 overflow-x-auto py-4">
-                        {items.map((src, i) => (
-                            <div
-                                className="w-full md:w-1/2 lg:w-1/4 px-2"
-                                key={i}>
-                                <div className="single_product bg-white shadow-sm rounded overflow-hidden">
-                                    <div className="product_thumb">
-                                        <a
-                                            href="#"
-                                            className="block">
-                                            <img
-                                                src={src}
-                                                alt=""
-                                                className="w-full h-48 object-cover"
-                                            />
-                                        </a>
-                                    </div>
-                                    <div className="product_content p-4">
-                                        <span className="product_price text-lg font-semibold text-gray-900">$50.00</span>
-                                        <h3 className="product_title mt-2 text-sm">
-                                            <a
-                                                href="#"
-                                                className="text-gray-800 hover:text-blue-600">
-                                                Product #{i + 1}
-                                            </a>
-                                        </h3>
-                                    </div>
+                    <div className="w-full px-2">
+                        <Carousel
+                            className="py-4"
+                            autoplay={false}>
+                            {items.map((src, i) => (
+                                <div
+                                    key={i}
+                                    className="px-2">
+                                    <ProductCard
+                                        image={src}
+                                        title={`Product #${i + 1}`}
+                                        price="$50.00"
+                                        href="/product"
+                                    />
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </Carousel>
                     </div>
                 </div>
             </div>

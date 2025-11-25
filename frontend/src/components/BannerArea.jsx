@@ -4,8 +4,8 @@ export default function BannerArea() {
     return (
         <div className="banner_area banner_two py-8">
             <div className="mx-auto px-4">
-                <div className="row">
-                    <div className="w-full md:w-1/2 lg:w-1/3 px-2">
+                <div className="flex gap-4 overflow-x-auto -mx-2 py-2">
+                    <div className="px-2 shrink-0 w-72 md:w-1/3">
                         <div className="single_banner relative overflow-hidden rounded shadow-sm">
                             <a
                                 href="#"
@@ -23,7 +23,7 @@ export default function BannerArea() {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full md:w-1/2 lg:w-1/3 px-2">
+                    <div className="px-2 shrink-0 w-72 md:w-1/3">
                         <div className="single_banner relative overflow-hidden rounded shadow-sm">
                             <a
                                 href="#"
@@ -41,7 +41,7 @@ export default function BannerArea() {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full md:w-1/2 lg:w-1/3 px-2">
+                    <div className="px-2 shrink-0 w-72 md:w-1/3">
                         <div className="single_banner relative overflow-hidden rounded shadow-sm">
                             <a
                                 href="#"
