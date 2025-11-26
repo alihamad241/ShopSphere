@@ -16,7 +16,28 @@ import ShopPage from "./pages/ShopPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 
+import { useUserStore } from "./stores/useUserStore";
+
+
 function App() {
+    const { user, checkAuth, checkingAuth } = useUserStore();
+    const { getCartItems } = useCartStore();
+
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        getCartItems();
+    }, [getCartItems, user]);
+
+    if (checkingAuth) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <Router>
             <Routes>
@@ -34,11 +55,11 @@ function App() {
                 />
                 <Route
                     path="/cart"
-                    element={<CartPage />}
+                    element={user ? <CartPage /> : <Login />}
                 />
                 <Route
                     path="/checkout"
-                    element={<Checkout />}
+                    element={user ? <Checkout /> : <Login />}
                 />
                 <Route
                     path="/contact"
@@ -50,7 +71,7 @@ function App() {
                 />
                 <Route
                     path="/my-account"
-                    element={<MyAccount />}
+                    element={user ? <MyAccount /> : <Login />}
                 />
                 <Route
                     path="/shop"
@@ -70,7 +91,7 @@ function App() {
                 />
                 <Route
                     path="/wishlist"
-                    element={<WishlistPage />}
+                    element={user ? <WishlistPage /> : <Login />}
                 />
                 <Route
                     path="/login"
@@ -78,7 +99,7 @@ function App() {
                 />
                 <Route
                     path="/admin"
-                    element={<AdminPage />}
+                    element={user?.role === 'admin' ? <AdminPage /> : <Login />}
                 />
                 <Route
                     path="/404"
