@@ -5,9 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import AnalyticsTab from "../components/AnalyticsTab";
-import axios from "../libs/axios";
-import { useUserStore } from "../stores/useUserStore";
 import { useProductStore } from "../stores/useProductStore";
+import { useBrandStore } from "../stores/useBrandStore";
 
 const tabs = [
     { id: "create", label: "Create Product", icon: PlusCircle },
@@ -16,9 +15,8 @@ const tabs = [
 
 const AdminPage = () => {
     const [activeTab, setActiveTab] = useState("create");
-    const { fetchAllProducts } = useProductStore();
-
-    const { user, checkingAuth, checkAuth } = useUserStore();
+    const { fetchAllProducts, createProduct, loading } = useProductStore();
+    const { fetchAllStores, createStore, deleteStore, stores, loading: storesLoading } = useBrandStore();
 
     const [productForm, setProductForm] = useState({
         name: "",
@@ -33,33 +31,51 @@ const AdminPage = () => {
     const [storeForm, setStoreForm] = useState({ name: "", description: "", image: "" });
     const [message, setMessage] = useState("");
 
-    // useEffect(() => {
-    //     fetchAllProducts();
-    //     if (checkingAuth) checkAuth();
-    // }, [fetchAllProducts]);
+    useEffect(() => {
+        fetchAllProducts();
+        fetchAllStores();
+    }, [fetchAllProducts, fetchAllStores]);
 
-    // if (checkingAuth) return <div className="p-8">Checking authentication...</div>;
-    // if (!user)
-    //     return (
-    //         <div className="p-8">
-    //             You must{" "}
-    //             <a
-    //                 className="text-blue-600 underline"
-    //                 href="/login">
-    //                 login
-    //             </a>{" "}
-    //             to access the admin dashboard.
-    //         </div>
-    //     );
-    // if (user.role !== "admin") return <div className="p-8">Access Denied. Admins only.</div>;
+    const fileToDataUrl = (file) =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
 
+    const handleProductFile = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const dataUrl = await fileToDataUrl(file);
+            setProductForm((s) => ({ ...s, image: dataUrl }));
+        } catch (err) {
+            console.error("File read error", err);
+            setMessage("Unable to read image file");
+        }
+    };
+
+    const handleStoreFile = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const dataUrl = await fileToDataUrl(file);
+            setStoreForm((s) => ({ ...s, image: dataUrl }));
+        } catch (err) {
+            console.error("File read error", err);
+            setMessage("Unable to read image file");
+        }
+    };
     const handleProductSubmit = async (e) => {
         e.preventDefault();
         setMessage("");
         try {
-            await axios.post("/products", productForm);
+            // use central product store to create product
+            await createProduct(productForm);
             setMessage("Product created");
             setProductForm({ name: "", description: "", price: "", image: "", category: "", gender: "", storeName: "" });
+            // refresh products list
             fetchAllProducts();
         } catch (err) {
             console.error(err);
@@ -71,12 +87,26 @@ const AdminPage = () => {
         e.preventDefault();
         setMessage("");
         try {
-            await axios.post("/stores", storeForm);
+            await createStore(storeForm);
             setMessage("Store created");
             setStoreForm({ name: "", description: "", image: "" });
+            await fetchAllStores();
         } catch (err) {
             console.error(err);
             setMessage(err?.response?.data?.message || "Error creating store");
+        }
+    };
+
+    const handleDeleteStore = async (id) => {
+        if (!confirm("Delete this store?")) return;
+        setMessage("");
+        try {
+            await deleteStore(id);
+            setMessage("Store deleted");
+            await fetchAllStores();
+        } catch (err) {
+            console.error(err);
+            setMessage(err?.response?.data?.message || "Error deleting store");
         }
     };
 
@@ -155,12 +185,23 @@ const AdminPage = () => {
                                                                 placeholder="Price"
                                                                 className="w-full border px-3 py-2 rounded"
                                                             />
-                                                            <input
-                                                                value={productForm.image}
-                                                                onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                                                                placeholder="Image URL or base64"
-                                                                className="w-full border px-3 py-2 rounded"
-                                                            />
+                                                            <div>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={handleProductFile}
+                                                                    className="w-full"
+                                                                />
+                                                                {productForm.image && (
+                                                                    <div className="mt-2">
+                                                                        <img
+                                                                            src={productForm.image}
+                                                                            alt="product preview"
+                                                                            className="w-24 h-24 object-cover rounded"
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                             <input
                                                                 value={productForm.storeName}
                                                                 onChange={(e) => setProductForm({ ...productForm, storeName: e.target.value })}
@@ -174,11 +215,58 @@ const AdminPage = () => {
                                                                 className="w-full border px-3 py-2 rounded"
                                                             />
                                                             <div className="flex justify-end">
-                                                                <button className="bg-emerald-600 text-white px-4 py-2 rounded">
+                                                                <button
+                                                                    type="submit"
+                                                                    disabled={loading}
+                                                                    className={`bg-emerald-600 text-white px-4 py-2 rounded ${
+                                                                        loading ? "opacity-60 cursor-not-allowed" : ""
+                                                                    }`}>
                                                                     Create Product
                                                                 </button>
                                                             </div>
                                                         </form>
+
+                                                        <div className="mt-6">
+                                                            <h4 className="text-md font-semibold mb-3">Existing Stores</h4>
+                                                            {storesLoading ? (
+                                                                <div className="text-sm text-gray-600">Loading stores...</div>
+                                                            ) : stores && stores.length > 0 ? (
+                                                                <ul className="space-y-3">
+                                                                    {stores.map((s) => (
+                                                                        <li
+                                                                            key={s._id}
+                                                                            className="flex items-center justify-between bg-gray-50 border rounded px-3 py-2">
+                                                                            <div className="flex items-center gap-3">
+                                                                                {s.logo_image ? (
+                                                                                    <img
+                                                                                        src={s.logo_image}
+                                                                                        alt={s.name}
+                                                                                        className="w-12 h-12 object-cover rounded"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-sm text-gray-600">
+                                                                                        No
+                                                                                    </div>
+                                                                                )}
+                                                                                <div>
+                                                                                    <div className="font-medium text-gray-800">{s.name}</div>
+                                                                                    <div className="text-sm text-gray-600">{s.description}</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <button
+                                                                                    onClick={() => handleDeleteStore(s._id)}
+                                                                                    className="text-sm text-red-600 hover:underline">
+                                                                                    Delete
+                                                                                </button>
+                                                                            </div>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            ) : (
+                                                                <div className="text-sm text-gray-600">No stores found.</div>
+                                                            )}
+                                                        </div>
                                                     </div>
 
                                                     <div className="p-6 bg-white rounded">
@@ -192,12 +280,23 @@ const AdminPage = () => {
                                                                 placeholder="Store name"
                                                                 className="w-full border px-3 py-2 rounded"
                                                             />
-                                                            <input
-                                                                value={storeForm.image}
-                                                                onChange={(e) => setStoreForm({ ...storeForm, image: e.target.value })}
-                                                                placeholder="Logo URL or base64"
-                                                                className="w-full border px-3 py-2 rounded"
-                                                            />
+                                                            <div>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={handleStoreFile}
+                                                                    className="w-full"
+                                                                />
+                                                                {storeForm.image && (
+                                                                    <div className="mt-2">
+                                                                        <img
+                                                                            src={storeForm.image}
+                                                                            alt="store preview"
+                                                                            className="w-24 h-24 object-cover rounded"
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                             <textarea
                                                                 value={storeForm.description}
                                                                 onChange={(e) => setStoreForm({ ...storeForm, description: e.target.value })}
@@ -205,7 +304,14 @@ const AdminPage = () => {
                                                                 className="w-full border px-3 py-2 rounded"
                                                             />
                                                             <div className="flex justify-end">
-                                                                <button className="bg-emerald-600 text-white px-4 py-2 rounded">Create Store</button>
+                                                                <button
+                                                                    type="submit"
+                                                                    disabled={storesLoading}
+                                                                    className={`bg-emerald-600 text-white px-4 py-2 rounded ${
+                                                                        storesLoading ? "opacity-60 cursor-not-allowed" : ""
+                                                                    }`}>
+                                                                    Create Store
+                                                                </button>
                                                             </div>
                                                         </form>
                                                     </div>
