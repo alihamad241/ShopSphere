@@ -5,7 +5,6 @@ import SingleProduct from "./pages/SingleProduct.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Login from "./pages/Login.jsx";
 import CartPage from "./pages/CartPage.jsx";
-import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import Contact from "./pages/Contact.jsx";
 import Faq from "./pages/Faq.jsx";
@@ -15,6 +14,7 @@ import ShopList from "./pages/ShopList.jsx";
 import ShopSidebar from "./pages/ShopSidebar.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
 
 function App() {
     return (
@@ -75,6 +75,10 @@ function App() {
                 <Route
                     path="/login"
                     element={<Login />}
+                />
+                <Route
+                    path="/admin"
+                    element={<AdminPage />}
                 />
                 <Route
                     path="/404"

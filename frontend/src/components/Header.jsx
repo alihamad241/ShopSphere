@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUserStore } from "../stores/useUserStore";
 
 export default function Header() {
     const [selectedLang, setSelectedLang] = useState("en");
@@ -14,15 +15,18 @@ export default function Header() {
             if (langRef.current && !langRef.current.contains(e.target)) {
                 setLangOpen(false);
             }
-            if (
-                currencyRef.current &&
-                !currencyRef.current.contains(e.target)
-            ) {
+            if (currencyRef.current && !currencyRef.current.contains(e.target)) {
                 setCurrencyOpen(false);
             }
         }
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
+
+    const { user, checkingAuth, checkAuth } = useUserStore();
+
+    useEffect(() => {
+        if (checkingAuth) checkAuth();
     }, []);
 
     return (
@@ -38,12 +42,7 @@ export default function Header() {
                                             className="languages mr-4"
                                             ref={langRef}
                                             onClick={(e) => {
-                                                if (
-                                                    e.target.closest(
-                                                        ".dropdown_languages"
-                                                    )
-                                                )
-                                                    return;
+                                                if (e.target.closest(".dropdown_languages")) return;
                                                 e.preventDefault();
                                                 setLangOpen((v) => !v);
                                                 setCurrencyOpen(false);
@@ -53,35 +52,21 @@ export default function Header() {
                                                 className="inline-flex items-center"
                                                 style={{ width: "auto" }}>
                                                 <img
-                                                    src={
-                                                        selectedLang === "fr"
-                                                            ? "/assets/img/logo/fontlogo2.jpg"
-                                                            : "/assets/img/logo/fontlogo.jpg"
-                                                    }
+                                                    src={selectedLang === "fr" ? "/assets/img/logo/fontlogo2.jpg" : "/assets/img/logo/fontlogo.jpg"}
                                                     alt=""
                                                     className="inline-block mr-2 h-4 w-4 object-cover"
                                                 />
-                                                <span className="mr-2">
-                                                    {selectedLang === "fr"
-                                                        ? "French"
-                                                        : "English"}
-                                                </span>
+                                                <span className="mr-2">{selectedLang === "fr" ? "French" : "English"}</span>
                                                 <i className="fa fa-angle-down"></i>
                                             </a>
 
-                                            <ul
-                                                className={
-                                                    "dropdown_languages" +
-                                                    (langOpen ? " open" : "")
-                                                }>
+                                            <ul className={"dropdown_languages" + (langOpen ? " open" : "")}>
                                                 <li>
                                                     <a
                                                         href="#"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            setSelectedLang(
-                                                                "en"
-                                                            );
+                                                            setSelectedLang("en");
                                                             setLangOpen(false);
                                                         }}>
                                                         <img
@@ -97,9 +82,7 @@ export default function Header() {
                                                         href="#"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            setSelectedLang(
-                                                                "fr"
-                                                            );
+                                                            setSelectedLang("fr");
                                                             setLangOpen(false);
                                                         }}>
                                                         <img
@@ -117,12 +100,7 @@ export default function Header() {
                                             className="currency"
                                             ref={currencyRef}
                                             onClick={(e) => {
-                                                if (
-                                                    e.target.closest(
-                                                        ".dropdown_currency"
-                                                    )
-                                                )
-                                                    return;
+                                                if (e.target.closest(".dropdown_currency")) return;
                                                 e.preventDefault();
                                                 setCurrencyOpen((v) => !v);
                                                 setLangOpen(false);
@@ -131,35 +109,19 @@ export default function Header() {
                                                 href="#"
                                                 className="inline-flex items-center"
                                                 style={{ width: "auto" }}>
-                                                <span className="mr-2">
-                                                    Currency :
-                                                </span>
-                                                <span className="font-semibold mr-2">
-                                                    {selectedCurrency === "eur"
-                                                        ? "€"
-                                                        : "$"}
-                                                </span>
+                                                <span className="mr-2">Currency :</span>
+                                                <span className="font-semibold mr-2">{selectedCurrency === "eur" ? "€" : "$"}</span>
                                                 <i className="fa fa-angle-down ml-2"></i>
                                             </a>
 
-                                            <ul
-                                                className={
-                                                    "dropdown_currency" +
-                                                    (currencyOpen
-                                                        ? " open"
-                                                        : "")
-                                                }>
+                                            <ul className={"dropdown_currency" + (currencyOpen ? " open" : "")}>
                                                 <li>
                                                     <a
                                                         href="#"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            setSelectedCurrency(
-                                                                "usd"
-                                                            );
-                                                            setCurrencyOpen(
-                                                                false
-                                                            );
+                                                            setSelectedCurrency("usd");
+                                                            setCurrencyOpen(false);
                                                         }}>
                                                         Dollar (USD)
                                                     </a>
@@ -169,12 +131,8 @@ export default function Header() {
                                                         href="#"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            setSelectedCurrency(
-                                                                "eur"
-                                                            );
-                                                            setCurrencyOpen(
-                                                                false
-                                                            );
+                                                            setSelectedCurrency("eur");
+                                                            setCurrencyOpen(false);
                                                         }}>
                                                         Euro (EUR)
                                                     </a>
@@ -188,7 +146,9 @@ export default function Header() {
                                 <div className="header_links text-right">
                                     <ul>
                                         <li>
-                                            <Link to="/contact" title="Contact">
+                                            <Link
+                                                to="/contact"
+                                                title="Contact">
                                                 Contact
                                             </Link>
                                         </li>
@@ -206,13 +166,26 @@ export default function Header() {
                                                 My account
                                             </Link>
                                         </li>
+                                        {user && user.role === "admin" && (
+                                            <li>
+                                                <Link
+                                                    to="/admin"
+                                                    title="Admin Dashboard">
+                                                    Admin
+                                                </Link>
+                                            </li>
+                                        )}
                                         <li>
-                                            <Link to="/cart" title="My cart">
+                                            <Link
+                                                to="/cart"
+                                                title="My cart">
                                                 My cart
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link to="/login" title="Login">
+                                            <Link
+                                                to="/login"
+                                                title="Login">
                                                 Login
                                             </Link>
                                         </li>
@@ -239,7 +212,9 @@ export default function Header() {
                             <div className="lg:w-3/4 md:w-3/4 w-full px-4">
                                 <div className="header_right_info">
                                     <div className="search_bar">
-                                        <form action="#" className="flex">
+                                        <form
+                                            action="#"
+                                            className="flex">
                                             <input
                                                 placeholder="Search..."
                                                 type="text"
@@ -256,9 +231,7 @@ export default function Header() {
                                         <Link
                                             to="/cart"
                                             className="inline-flex items-center text-gray-800">
-                                            <i className="fa fa-shopping-cart mr-2"></i>{" "}
-                                            2Items - $209.44{" "}
-                                            <i className="fa fa-angle-down ml-2"></i>
+                                            <i className="fa fa-shopping-cart mr-2"></i> 2Items - $209.44 <i className="fa fa-angle-down ml-2"></i>
                                         </Link>
                                     </div>
                                 </div>
@@ -293,47 +266,22 @@ export default function Header() {
                                                             <div className="mega_items">
                                                                 <ul>
                                                                     <li>
-                                                                        <Link to="/shop/list">
-                                                                            shop
-                                                                            list
-                                                                        </Link>
+                                                                        <Link to="/shop/list">shop list</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/fullwidth">
-                                                                            shop
-                                                                            Full
-                                                                            Width
-                                                                            Grid
-                                                                        </Link>
+                                                                        <Link to="/shop/fullwidth">shop Full Width Grid</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/fullwidth">
-                                                                            shop
-                                                                            Full
-                                                                            Width
-                                                                            list
-                                                                        </Link>
+                                                                        <Link to="/shop/fullwidth">shop Full Width list</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/sidebar">
-                                                                            shop
-                                                                            Right
-                                                                            Sidebar
-                                                                        </Link>
+                                                                        <Link to="/shop/sidebar">shop Right Sidebar</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/shop/sidebar">
-                                                                            shop
-                                                                            list
-                                                                            Right
-                                                                            Sidebar
-                                                                        </Link>
+                                                                        <Link to="/shop/sidebar">shop list Right Sidebar</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/product">
-                                                                            Product
-                                                                            Details
-                                                                        </Link>
+                                                                        <Link to="/product">Product Details</Link>
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -365,27 +313,16 @@ export default function Header() {
                                                             <div className="mega_items">
                                                                 <ul>
                                                                     <li>
-                                                                        <Link to="/about">
-                                                                            About
-                                                                            Us
-                                                                        </Link>
+                                                                        <Link to="/about">About Us</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/my-account">
-                                                                            my
-                                                                            account
-                                                                        </Link>
+                                                                        <Link to="/my-account">my account</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/faq">
-                                                                            Frequently
-                                                                            Questions
-                                                                        </Link>
+                                                                        <Link to="/faq">Frequently Questions</Link>
                                                                     </li>
                                                                     <li>
-                                                                        <Link to="/404">
-                                                                            404
-                                                                        </Link>
+                                                                        <Link to="/404">404</Link>
                                                                     </li>
                                                                 </ul>
                                                             </div>
