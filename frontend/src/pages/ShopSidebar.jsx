@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function ShopSidebar() {
+    const { products, fetchAllProducts, loading } = useProductStore();
+
+    useEffect(() => {
+        fetchAllProducts();
+    }, [fetchAllProducts]);
+
+    const list = products || [];
+
     return (
         <>
             <Header />
@@ -45,16 +54,21 @@ export default function ShopSidebar() {
 
                                 <div className="shop_products">
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        {Array.from({ length: 9 }).map((_, i) => (
-                                            <ProductCard
-                                                key={i}
-                                                image={`/assets/img/product/product${(i % 9) + 1}.jpg`}
-                                                title={`Sidebar Product ${(i % 9) + 1}`}
-                                                price="$39.00"
-                                                href="/product"
-                                                badge="/assets/img/cart/span-new.png"
-                                            />
-                                        ))}
+                                        {loading
+                                            ? Array.from({ length: 9 }).map((_, i) => (
+                                                  <div
+                                                      key={i}
+                                                      className="bg-gray-100 h-40 rounded"
+                                                  />
+                                              ))
+                                            : list.slice(0, 9).map((p) => (
+                                                  <ProductCard
+                                                      key={p._id}
+                                                      product={p}
+                                                      href={`/product/${p._id}`}
+                                                      badge="/assets/img/cart/span-new.png"
+                                                  />
+                                              ))}
                                     </div>
                                 </div>
                             </div>

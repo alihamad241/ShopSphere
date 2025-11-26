@@ -1,56 +1,37 @@
 import React from "react";
 
-export default function ProductDetails() {
+export default function ProductDetails({ product, loading }) {
+    const name = product?.name || "Product Name";
+    const description = product?.description || "Product description will appear here.";
+    const price = product ? `$${product.price.toFixed(2)}` : "$0.00";
+
     return (
         <div className="w-full md:w-1/2 lg:w-7/12 px-4">
             <div className="product_d_right space-y-4">
-                <h1 className="text-2xl font-bold">Printed Summer Dress</h1>
+                <h1 className="text-2xl font-bold">{name}</h1>
                 <div className="product_ratting mb-2">
                     <ul className="flex gap-1 text-yellow-400">
-                        <li>
-                            <a href="#">
-                                <i className="fa fa-star"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i className="fa fa-star"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i className="fa fa-star"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i className="fa fa-star"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i className="fa fa-star"></i>
-                            </a>
-                        </li>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <li key={i}>
+                                <a href="#">
+                                    <i className="fa fa-star"></i>
+                                </a>
+                            </li>
+                        ))}
                         <li>
                             <a
                                 href="#"
                                 className="text-sm ml-2">
-                                {" "}
-                                Write a review{" "}
+                                Write a review
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div className="product_desc text-gray-700">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati modi culpa voluptates illo, quos magni totam inventore
-                        delectus perspiciatis necessitatibus.
-                    </p>
+                    <p>{description}</p>
                 </div>
                 <div className="content_price mb-2 text-xl">
-                    <span className="font-semibold mr-3">$118.00</span>
-                    <span className="old-price text-gray-500 line-through">$130.00</span>
+                    <span className="font-semibold mr-3">{price}</span>
                 </div>
                 <div className="box_quantity mb-2 flex items-center gap-4">
                     <form
@@ -126,8 +107,7 @@ export default function ProductDetails() {
                     </div>
                 </div>
                 <div className="product_stock mb-2 text-sm text-gray-600">
-                    <p>299 items</p>
-                    <span> In stock </span>
+                    <p>In stock</p>
                 </div>
                 <div className="wishlist-share mt-2">
                     <h4 className="font-semibold">Share on:</h4>

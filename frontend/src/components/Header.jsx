@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
 
 export default function Header() {
@@ -23,7 +23,14 @@ export default function Header() {
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
-    const { user, checkingAuth, checkAuth } = useUserStore();
+    const { user, checkingAuth, checkAuth, logout } = useUserStore();
+    const navigate = useNavigate();
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        await logout();
+        navigate("/");
+    };
 
     useEffect(() => {
         if (checkingAuth) checkAuth();
@@ -183,11 +190,20 @@ export default function Header() {
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link
-                                                to="/login"
-                                                title="Login">
-                                                Login
-                                            </Link>
+                                            {user ? (
+                                                <a
+                                                    href="#"
+                                                    onClick={handleLogout}
+                                                    title="Logout">
+                                                    Logout
+                                                </a>
+                                            ) : (
+                                                <Link
+                                                    to="/login"
+                                                    title="Login">
+                                                    Login
+                                                </Link>
+                                            )}
                                         </li>
                                     </ul>
                                 </div>

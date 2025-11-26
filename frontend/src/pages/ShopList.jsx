@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function ShopList() {
+    const { products, fetchAllProducts, loading } = useProductStore();
+
+    useEffect(() => {
+        fetchAllProducts();
+    }, [fetchAllProducts]);
+
+    const list = products || [];
+
     return (
         <>
             <Header />
@@ -45,17 +54,22 @@ export default function ShopList() {
 
                                 <div className="shop_products">
                                     <div className="space-y-6">
-                                        {[2, 3, 4, 5, 6, 7].map((i) => (
-                                            <ProductCard
-                                                key={i}
-                                                image={`/assets/img/product/product${i}.jpg`}
-                                                title={`List Product ${i}`}
-                                                price="$49.00"
-                                                href="/product"
-                                                badge="/assets/img/cart/span-new.png"
-                                                variant="list"
-                                            />
-                                        ))}
+                                        {loading
+                                            ? Array.from({ length: 6 }).map((_, i) => (
+                                                  <div
+                                                      key={i}
+                                                      className="bg-gray-100 h-40 rounded"
+                                                  />
+                                              ))
+                                            : list.slice(0, 6).map((p) => (
+                                                  <ProductCard
+                                                      key={p._id}
+                                                      product={p}
+                                                      href={`/product/${p._id}`}
+                                                      badge="/assets/img/cart/span-new.png"
+                                                      variant="list"
+                                                  />
+                                              ))}
                                     </div>
                                 </div>
                             </div>

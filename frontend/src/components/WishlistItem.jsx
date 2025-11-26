@@ -1,8 +1,8 @@
 import React from 'react'
-// import { useCartStore } from "../stores/useCartStore";
+import { useCartStore } from "../stores/useCartStore";
 
 const WishlistItem = ({item}) => {
-//  const { removeFromWishlist,addToCart } = useCartStore();
+ const { removeFromWishlist,addToCart } = useCartStore();
 
   return (
     <tr className="border border-gray-200 text-center font-bold">

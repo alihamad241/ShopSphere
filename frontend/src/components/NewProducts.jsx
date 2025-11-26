@@ -1,14 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProductCard from "./ProductCard";
 import Carousel from "./Carousel";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function NewProducts() {
-    const products = [
-        { img: "/assets/img/product/product1.jpg", price: "$50.00", title: "Curabitur sodales" },
-        { img: "/assets/img/product/product2.jpg", price: "$40.00", title: "Quisque ornare dui" },
-        { img: "/assets/img/product/product3.jpg", price: "$60.00", title: "Sed non turpiss" },
-        { img: "/assets/img/product/product4.jpg", price: "$65.00", title: "Duis convallis" },
-    ];
+    const { products, fetchAllProducts, loading } = useProductStore();
+
+    useEffect(() => {
+        fetchAllProducts();
+    }, [fetchAllProducts]);
+
+    // show newest products by createdAt (descending)
+    const newest = (products || [])
+        .slice()
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 4);
+
     return (
         <div className="new_product_area product_two py-12">
             <div className="mx-auto px-4">
@@ -24,18 +31,27 @@ export default function NewProducts() {
                         <Carousel
                             className="py-4"
                             autoplay={false}>
-                            {products.map((p, i) => (
-                                <div
-                                    key={i}
-                                    className="px-2">
-                                    <ProductCard
-                                        image={p.img}
-                                        title={p.title}
-                                        price={p.price}
-                                        href="/product"
-                                    />
-                                </div>
-                            ))}
+                            {loading &&
+                                Array.from({ length: 4 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="px-2">
+                                        <div className="bg-gray-100 w-full h-40 rounded" />
+                                    </div>
+                                ))}
+
+                            {!loading && newest.length > 0
+                                ? newest.map((p) => (
+                                      <div
+                                          key={p._id}
+                                          className="px-2">
+                                          <ProductCard
+                                              product={p}
+                                              href={`/product/${p._id}`}
+                                          />
+                                      </div>
+                                  ))
+                                : null}
                         </Carousel>
                     </div>
                 </div>

@@ -12,7 +12,8 @@ export const useCartStore = create((set, get) => ({
     getCartItems: async () => {
         try {
             const res = await axios.get("/cart");
-            set({ cart: res.data.cart });
+            // backend returns an array of cart items
+            set({ cart: res.data });
             get().calculateTotals();
         } catch (error) {
             set({ cart: [] });
@@ -42,12 +43,24 @@ export const useCartStore = create((set, get) => ({
     },
 
     removeFromCart: async (productId) => {
-        await axios.delete(`/cart/`, { data: { productId } });
-        toast.success("Product removed from cart");
-        set((prevState) => ({
-            cart: prevState.cart.filter((item) => item._id !== productId),
-        }));
-        get().calculateTotals();
+        try {
+            await axios.delete(`/cart/`, { data: { productId } });
+            toast.success("Product removed from cart");
+            // refresh cart from server to get populated product objects
+            await get().getCartItems();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to remove item from cart");
+        }
+    },
+
+    updateQuantity: async (productId, quantity) => {
+        try {
+            await axios.put(`/cart/${productId}`, { quantity });
+            // refresh cart to get populated product objects and recalculate totals
+            await get().getCartItems();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to update quantity");
+        }
     },
 
     calculateTotals: () => {

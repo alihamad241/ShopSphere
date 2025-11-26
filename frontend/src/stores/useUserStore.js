@@ -21,6 +21,7 @@ export const useUserStore = create((set, get) => ({
                 password,
             });
             set({ user: res.data.user, loading: false });
+            toast.success("Signup successful");
         } catch (error) {
             set({ loading: false });
             toast.error(error.response.data.message || "Something went wrong, please try again.");
@@ -34,7 +35,9 @@ export const useUserStore = create((set, get) => ({
                 email,
                 password,
             });
-            set({ user: res.data, loading: false });
+            // server returns { user: {..}, message }
+            set({ user: res.data.user, loading: false });
+            toast.success("Login successful");
         } catch (error) {
             set({ loading: false });
             toast.error(error.response.data.message || "Something went wrong, please try again.");
@@ -53,6 +56,7 @@ export const useUserStore = create((set, get) => ({
         try {
             await axios.post("/auth/logout");
             set({ user: null });
+            toast.success("Logged out successfully");
         } catch (error) {
             toast.error(error.response?.data?.message || "Something went wrong, please try again.");
         }

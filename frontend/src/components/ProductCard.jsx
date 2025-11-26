@@ -1,6 +1,36 @@
 import React from "react";
+import { useProductStore } from "../stores/useProductStore";
+import { useCartStore } from "../stores/useCartStore";
+import { useUserStore } from "../stores/useUserStore";
+import { Trash, Star } from "lucide-react";
 
-export default function ProductCard({ image, title, price, href = "/product", badge, variant = "grid", onViewDetail }) {
+export default function ProductCard({ product = null, image, title, price, href = "/product", badge, variant = "grid", onViewDetail }) {
+    // support both flat props and product object
+    const prod = product || { image, title, price };
+    const productId = prod._id;
+
+    const { deleteProduct, toggleFeaturedProduct } = useProductStore();
+    const { addToCart } = useCartStore();
+    const { user } = useUserStore();
+
+    const handleAddToCart = async (e) => {
+        e.preventDefault();
+        if (!prod || !productId) return; // need id to add
+        await addToCart({ _id: productId });
+    };
+
+    const handleDelete = async (e) => {
+        e.preventDefault();
+        if (!productId) return;
+        if (!confirm("Delete this product?")) return;
+        await deleteProduct(productId);
+    };
+
+    const handleToggleFeatured = async (e) => {
+        e.preventDefault();
+        if (!productId) return;
+        await toggleFeaturedProduct(productId);
+    };
     if (variant === "list") {
         return (
             <div className="product_list_item mb-6 bg-white rounded shadow-sm overflow-hidden flex flex-wrap">
@@ -54,8 +84,8 @@ export default function ProductCard({ image, title, price, href = "/product", ba
                     href={href}
                     className="block">
                     <img
-                        src={image}
-                        alt={title}
+                        src={prod.image}
+                        alt={prod.title || title}
                         className="w-full h-44 object-cover transform transition-transform duration-300 group-hover:scale-105"
                     />
                 </a>
@@ -68,12 +98,28 @@ export default function ProductCard({ image, title, price, href = "/product", ba
                         />
                     </div>
                 )}
-                <div className="product_action absolute inset-x-2 -bottom-10 group-hover:bottom-2 transition-all duration-300 flex justify-center">
-                    <a
-                        href="#"
+                <div className="product_action absolute inset-x-2 -bottom-10 group-hover:bottom-2 transition-all duration-300 flex justify-center space-x-2">
+                    <button
+                        onClick={handleAddToCart}
                         className="bg-white text-sm px-3 py-1 rounded shadow">
                         Add to cart
-                    </a>
+                    </button>
+                    {user && user.role === "admin" && (
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={handleToggleFeatured}
+                                title="Toggle featured"
+                                className="bg-white p-1 rounded shadow">
+                                <Star className="w-4 h-4 text-yellow-500" />
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                title="Delete product"
+                                className="bg-white p-1 rounded shadow">
+                                <Trash className="w-4 h-4 text-red-500" />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="product_content p-4">
