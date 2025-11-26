@@ -39,7 +39,7 @@ export const getFeaturedStores = async (req, res) => {
 
 export const createStore = async (req, res) => {
     try {
-        const { name, description, price, image, category } = req.body;
+        const { name, description, image } = req.body;
 
         let cloudinaryResponse = null;
 
@@ -52,11 +52,9 @@ export const createStore = async (req, res) => {
         const store = await Store.create({
             name,
             description,
-            price,
-            image: cloudinaryResponse?.secure_url
+            logo_image: cloudinaryResponse?.secure_url
                 ? cloudinaryResponse.secure_url
-                : '',
-            category
+                : ''
         });
 
         res.status(201).json( store );

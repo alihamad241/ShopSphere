@@ -1,23 +1,23 @@
 import express from 'express';
 import {
     getAllProducts,
-    getFeaturedProducts,
+    // getFeaturedProducts,
     createProduct,
     deleteProduct,
     getRecommendedProducts,
-    getProductsByCategory,
-    toggleFeaturedProduct
+    getProductsByCategory
+    // toggleFeaturedProduct
 } from '../controllers/product.controller.js';
-import { protectRoute, adminRoute, ownerRoute } from '../middleware/auth.middleware.js';
+import { protectRoute, adminRoute } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.get('/', protectRoute, getAllProducts);
-router.get('/featured', getFeaturedProducts);
+// router.get('/featured', getFeaturedProducts);
 router.get('/category/:category', getProductsByCategory);
 router.get('/recommendations', getRecommendedProducts);
-router.post('/', protectRoute, ownerRoute, createProduct);
-router.patch('/:id', protectRoute, ownerRoute, toggleFeaturedProduct);
-router.delete('/:id', protectRoute, ownerRoute, deleteProduct);
+router.post('/', protectRoute, adminRoute, createProduct);
+router.get('/:name', getAllProducts);
+// router.patch('/:id', protectRoute, adminRoute, toggleFeaturedProduct);
+router.delete('/:id', protectRoute, adminRoute, deleteProduct);
 
 export default router;

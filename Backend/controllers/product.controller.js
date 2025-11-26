@@ -1,11 +1,31 @@
 import { redis } from '../libs/redis.js';
 import Product from '../models/product.model.js';
+import Store from '../models/store.model.js';
 import cloudinary from './../libs/cloudinary.js';
 
 export const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find({});
+        const { storeName } = req.params;
+        let products;
+
+        if (storeName) {
+            // find store by name (case-insensitive)
+            const store = await Store.findOne({
+                name: { $regex: `^${storeName}$`, $options: 'i' }
+            });
+
+            if (!store) {
+                return res.status(404).json({ message: 'Store not found' });
+            }
+
+            // get products using the store's ObjectId
+            products = await Product.find({ store: store._id });
+        } else {
+            products = await Product.find({});
+        }
+
         res.status(200).json({ products });
+
     } catch (error) {
         res.status(500).json({ message: 'Error fetching products', error });
     }
@@ -38,7 +58,7 @@ export const getFeaturedProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
-        const { name, description, price, image, category } = req.body;
+        const { name, description, price, image, category, gender, storeName } = req.body;
 
         let cloudinaryResponse = null;
 
@@ -48,6 +68,11 @@ export const createProduct = async (req, res) => {
             });
         }
 
+        // find store by name (case-insensitive)
+        const store = await Store.findOne({
+            name: { $regex: `^${storeName}$`, $options: 'i' }
+        });
+
         const product = await Product.create({
             name,
             description,
@@ -55,7 +80,9 @@ export const createProduct = async (req, res) => {
             image: cloudinaryResponse?.secure_url
                 ? cloudinaryResponse.secure_url
                 : '',
-            category
+            category,
+            gender,
+            store
         });
 
         res.status(201).json( product );
