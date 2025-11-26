@@ -1,43 +1,43 @@
 import Product from '../models/product.model.js';
 
-export const addToCart = async (req, res) => {
+export const addToWishlist = async (req, res) => {
     try {
         const { productId } = req.body;
         const user = req.user;
 
-        const existingItem = user.cartItems.find(
+        const existingItem = user.wishlist.find(
             (item) => item.id === productId
         );
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
-            user.cartItems.push(productId);
+            user.wishlist.push(productId);
         }
 
         await user.save();
-        res.json(user.cartItems);
+        res.json(user.wishlist);
     } catch (error) {
-        res.status(500).json({ message: 'Error adding to cart', error });
+        res.status(500).json({ message: 'Error adding to wishlist', error });
     }
 };
 
-export const removeAllFromCart = async (req, res) => {
+export const removeAllFromWishlist = async (req, res) => {
     try {
         const { productId } = req.body;
         const user = req.user;
 
         if (!productId) {
-            user.cartItems = [];
+            user.wishlist = [];
         } else {
-            user.cartItems = user.cartItems.filter(
+            user.wishlist = user.wishlist.filter(
                 (item) => item.id !== productId
             );
         }
 
         await user.save();
-        res.json(user.cartItems);
+        res.json(user.wishlist);
     } catch (error) {
-        res.status(500).json({ message: 'Error removing from cart', error });
+        res.status(500).json({ message: 'Error removing from wishlist', error });
     }
 };
 
@@ -46,49 +46,49 @@ export const updateQuantity = async (req, res) => {
         const { id: productId } = req.params;
         const { quantity } = req.body;
         const user = req.user;
-        const existingItem = user.cartItems.find(
+        const existingItem = user.wishlist.find(
             (item) => item.id === productId
         );
         if (existingItem) {
             if (quantity === 0) {
-                user.cartItems = user.cartItems.filter(
+                user.wishlist = user.wishlist.filter(
                     (item) => item.id !== productId
                 );
                 await user.save();
-                return res.json(user.cartItems);
+                return res.json(user.wishlist);
             }
 
             existingItem.quantity = quantity;
             await user.save();
-            res.json(user.cartItems);
+            res.json(user.wishlist);
         } else {
-            res.status(404).json({ message: 'Product not found in cart' });
+            res.status(404).json({ message: 'Product not found in wishlist' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error updating quantity', error });
     }
 };
 
-export const getCartProducts = async (req, res) => {
+export const getWishlistProducts = async (req, res) => {
     try {
-        const productIds = req.user.cartItems.map((item) => item._id);
+        const productIds = req.user.wishlist.map((item) => item._id);
         const products = await Product.find({ _id: { $in: productIds } });
 
-        const cartItems = products.map((product) => {
-            const item = req.user.cartItems.find(
-                (cartItem) => cartItem._id.toString() === product._id.toString()
+        const wishlistItems = products.map((product) => {
+            const item = req.user.wishlist.find(
+                (wishlistItem) => wishlistItem._id.toString() === product._id.toString()
             );
             return {
                 ...product.toJSON(),
                 quantity: item.quantity
             };
         });
-        // console.log(cartItems);
+        // console.log(wishlistItems);
 
-        res.status(200).json(cartItems);
+        res.status(200).json(wishlistItems);
     } catch (error) {
         res.status(500).json({
-            message: 'Error fetching cart products',
+            message: 'Error fetching wishlist products',
             error
         });
     }

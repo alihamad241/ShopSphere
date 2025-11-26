@@ -1,38 +1,84 @@
 import mongoose from "mongoose";
 
+const orderItemSchema = new mongoose.Schema({
+	product: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Product",
+		required: true,
+	},
+	quantity: {
+		type: Number,
+		required: true,
+		min: 1,
+	},
+	price: {
+		type: Number,
+		required: true,
+		min: 0,
+	},
+});
+
 const orderSchema = new mongoose.Schema(
 	{
-        // reference to the user who placed the order
+		// user who placed the order
 		user: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
 		},
-        // array of products in the order
-		products: [
-			{
-				product: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "Product",
-					required: true,
-				},
-				quantity: {
-					type: Number,
-					required: true,
-					min: 1,
-				},
-				price: {
-					type: Number,
-					required: true,
-					min: 0,
-				},
-			},
-		],
+
+		// single store per order (Talabat-style)
+		store: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Store",
+			required: true,
+		},
+
+		// items (products + quantity + price at checkout)
+		products: [orderItemSchema],
+
+		// total cost
 		totalAmount: {
 			type: Number,
 			required: true,
 			min: 0,
 		},
+
+		// order status workflow
+		status: {
+			type: String,
+			enum: [
+				"pending",
+				"confirmed",
+				"preparing",
+				"out_for_delivery",
+				"completed",
+				"cancelled",
+			],
+			default: "pending",
+		},
+
+		// address for delivery
+		address: {
+			type: String,
+			required: true,
+		},
+
+		// payment method used
+		paymentMethod: {
+			type: String,
+			enum: ["cash", "card"],
+			default: "cash",
+		},
+
+		// status of the payment
+		paymentStatus: {
+			type: String,
+			enum: ["pending", "paid", "failed"],
+			default: "pending",
+		},
+
+		// Stripe support
 		stripeSessionId: {
 			type: String,
 			unique: true,
