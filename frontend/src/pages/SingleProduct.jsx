@@ -11,33 +11,38 @@ import { useProductStore } from "../stores/useProductStore";
 
 export default function SingleProduct() {
     const { id } = useParams();
-    const { products, fetchAllProducts, loading } = useProductStore();
+    const { products, fetchAllProducts, fetchProductById, loading } = useProductStore();
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
-        // If products already loaded in store, use it
-        if (products && products.length) {
-            const p = products.find((x) => x._id === id);
-            if (p) {
-                setProduct(p);
-                return;
-            }
-        }
+        let mounted = true;
 
-        // otherwise fetch all products then pick the one
         const load = async () => {
-            await fetchAllProducts();
+            // prefer to load single product by id
+            if (id) {
+                const p = await fetchProductById(id);
+                if (mounted && p) {
+                    setProduct(p);
+                    return;
+                }
+            }
+
+            // fallback: ensure all products are loaded and pick
+            if (!products || !products.length) {
+                await fetchAllProducts();
+            }
+            if (mounted) {
+                const p2 = (products || []).find((x) => x._id === id);
+                if (p2) setProduct(p2);
+            }
         };
 
         load();
-    }, [id, products, fetchAllProducts]);
 
-    useEffect(() => {
-        if (!product && products && products.length) {
-            const p = products.find((x) => x._id === id);
-            if (p) setProduct(p);
-        }
-    }, [products, product, id]);
+        return () => {
+            mounted = false;
+        };
+    }, [id, products, fetchAllProducts, fetchProductById]);
 
     return (
         <>
@@ -85,8 +90,8 @@ export default function SingleProduct() {
 
             <div className="mx-auto px-4">
                 <div className="pos_page_inner">
-                    <ProductTabs />
-                    <RelatedProducts />
+                    <ProductTabs product={product} />
+                    <RelatedProducts currentProduct={product} />
                 </div>
             </div>
 

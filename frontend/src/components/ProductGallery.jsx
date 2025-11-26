@@ -5,10 +5,11 @@ export default function ProductGallery({ product, loading }) {
 
     const setPic = (id) => setActivePic(id);
 
-    const mainImage = product?.image || "/assets/img/product/product13.jpg";
     const thumbs = product
         ? [product.image, product.image, product.image]
         : ["/assets/img/cart/cart.jpg", "/assets/img/cart/cart2.jpg", "/assets/img/cart/cart4.jpg"];
+    const activeIndex = Math.max(0, parseInt(activePic.replace("p_tab", ""), 10) - 1 || 0);
+    const mainImage = thumbs[activeIndex] || thumbs[0] || "/assets/img/product/product13.jpg";
 
     return (
         <div className="lg:w-5/12 md:w-1/2 w-full px-4">
@@ -39,13 +40,13 @@ export default function ProductGallery({ product, loading }) {
                 <div className="tab-content produc_tab_c mt-4">
                     <div
                         className="tab-pane fade show active"
-                        id="p_tab1"
+                        id={activePic}
                         role="tabpanel">
                         <div className="modal_img relative">
                             <a href="#">
                                 <img
                                     src={mainImage}
-                                    alt=""
+                                    alt={product?.name || "product image"}
                                     className="w-full block rounded"
                                 />
                             </a>

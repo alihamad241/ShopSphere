@@ -211,13 +211,13 @@ const AdminPage = () => {
                                                             <input
                                                                 value={productForm.gender}
                                                                 onChange={(e) => setProductForm({ ...productForm, gender: e.target.value })}
-                                                                placeholder="Brand / Store name"
+                                                                placeholder="Gender"
                                                                 className="w-full border px-3 py-2 rounded"
                                                             />
                                                             <input
                                                                 value={productForm.category}
                                                                 onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                                                                placeholder="Brand / Store name"
+                                                                placeholder="Category"
                                                                 className="w-full border px-3 py-2 rounded"
                                                             />
                                                             <textarea

@@ -3,10 +3,10 @@ import React from "react";
 export default function ProductModal({ isOpen = false, onClose = null, product = null }) {
     if (!isOpen) return null;
 
-    const title = product?.title || "Handbag feugiat";
-    const img = product?.img || "/assets/img/product/product13.jpg";
-    const price = product?.price || "$64.99";
-    const oldPrice = product?.oldPrice || "$78.99";
+    const title = product?.title || product?.name || "Handbag feugiat";
+    const img = product?.image || "/assets/img/product/product13.jpg";
+    const price = product?.price ? `$${product.price}` : "$64.99";
+    const oldPrice = product?.oldPrice ? `$${product.oldPrice}` : "$78.99";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

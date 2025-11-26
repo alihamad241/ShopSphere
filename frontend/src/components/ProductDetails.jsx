@@ -3,10 +3,10 @@ import React from "react";
 export default function ProductDetails({ product, loading }) {
     const name = product?.name || "Product Name";
     const description = product?.description || "Product description will appear here.";
-    const price = product ? `$${product.price.toFixed(2)}` : "$0.00";
+    const price = product?.price != null ? `$${Number(product.price).toFixed(2)}` : "$0.00";
 
     return (
-        <div className="w-full md:w-1/2 lg:w-7/12 px-4">
+        <div className="w-full md:w-1/2 lg:w-6/12 px-4">
             <div className="product_d_right space-y-4">
                 <h1 className="text-2xl font-bold">{name}</h1>
                 <div className="product_ratting mb-2">

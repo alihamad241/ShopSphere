@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
+import { useCartStore } from "../stores/useCartStore";
 
 export default function Header() {
     const [selectedLang, setSelectedLang] = useState("en");
@@ -26,6 +27,9 @@ export default function Header() {
     const { user, checkingAuth, checkAuth, logout } = useUserStore();
     const navigate = useNavigate();
 
+    const { cart, subtotal, total, getCartItems } = useCartStore();
+    const itemCount = (cart || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+
     const handleLogout = async (e) => {
         e.preventDefault();
         await logout();
@@ -35,6 +39,11 @@ export default function Header() {
     useEffect(() => {
         if (checkingAuth) checkAuth();
     }, []);
+
+    useEffect(() => {
+        // ensure cart is loaded on header mount
+        getCartItems();
+    }, [getCartItems]);
 
     return (
         <header>
@@ -247,7 +256,14 @@ export default function Header() {
                                         <Link
                                             to="/cart"
                                             className="inline-flex items-center text-gray-800">
-                                            <i className="fa fa-shopping-cart mr-2"></i> 2Items - $209.44 <i className="fa fa-angle-down ml-2"></i>
+                                            <i className="fa fa-shopping-cart mr-2"></i>
+                                            <span className="font-medium">{itemCount || 0} Items</span>
+                                            <span className="mx-2">-</span>
+                                            <span className="font-medium">
+                                                {selectedCurrency === "eur" ? "€" : "$"}
+                                                {(typeof total === "number" && total >= 0 ? total : subtotal || 0).toFixed(2)}
+                                            </span>
+                                            <i className="fa fa-angle-down ml-2"></i>
                                         </Link>
                                     </div>
                                 </div>

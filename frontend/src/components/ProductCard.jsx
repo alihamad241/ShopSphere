@@ -8,6 +8,8 @@ export default function ProductCard({ product = null, image, title, price, href 
     // support both flat props and product object
     const prod = product || { image, title, price };
     const productId = prod._id;
+    const hrefTo = productId ? `/product/${productId}` : href || "/product";
+    const displayTitle = prod.name || prod.title || title;
 
     const { deleteProduct, toggleFeaturedProduct } = useProductStore();
     const { addToCart } = useCartStore();
@@ -36,11 +38,11 @@ export default function ProductCard({ product = null, image, title, price, href 
             <div className="product_list_item mb-6 bg-white rounded shadow-sm overflow-hidden flex flex-wrap">
                 <div className="w-full md:w-1/3 lg:w-1/4 relative">
                     <a
-                        href={href}
+                        href={hrefTo}
                         className="block">
                         <img
-                            src={image}
-                            alt={title}
+                            src={prod.image}
+                            alt={displayTitle}
                             className="w-full h-40 object-cover"
                         />
                     </a>
@@ -57,14 +59,14 @@ export default function ProductCard({ product = null, image, title, price, href 
                 <div className="w-full md:w-2/3 lg:w-3/4 p-4">
                     <h3 className="text-lg font-semibold">
                         <a
-                            href={href}
+                            href={hrefTo}
                             className="text-gray-800 hover:text-blue-600">
-                            {title}
+                            {displayTitle}
                         </a>
                     </h3>
                     <p className="text-sm text-gray-600 mt-2">This is a short description for the product, matching the list view structure.</p>
                     <div className="mt-4 flex items-center justify-between border-t pt-3">
-                        <span className="text-lg font-bold text-gray-900">{price}</span>
+                        <span className="text-lg font-bold text-gray-900">{prod.price || price}</span>
                         <a
                             href="#"
                             className="text-blue-600">
@@ -81,11 +83,11 @@ export default function ProductCard({ product = null, image, title, price, href 
         <div className="single_product group bg-white rounded shadow-sm overflow-hidden relative">
             <div className="product_thumb relative overflow-hidden">
                 <a
-                    href={href}
+                    href={hrefTo}
                     className="block">
                     <img
                         src={prod.image}
-                        alt={prod.title || title}
+                        alt={displayTitle}
                         className="w-full h-44 object-cover transform transition-transform duration-300 group-hover:scale-105"
                     />
                 </a>
@@ -123,12 +125,12 @@ export default function ProductCard({ product = null, image, title, price, href 
                 </div>
             </div>
             <div className="product_content p-4">
-                <span className="product_price text-lg font-semibold text-gray-900">{price}</span>
+                <span className="product_price text-lg font-semibold text-gray-900">{prod.price || price}</span>
                 <h3 className="product_title mt-2 text-sm">
                     <a
-                        href={href}
+                        href={hrefTo}
                         className="text-gray-800 hover:text-blue-600">
-                        {title}
+                        {displayTitle}
                     </a>
                 </h3>
             </div>
