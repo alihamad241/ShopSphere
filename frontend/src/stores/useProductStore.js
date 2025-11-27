@@ -2,7 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import axios from "../libs/axios";
 
-export const useProductStore = create((set) => ({
+export const useProductStore = create((set, get) => ({
     products: [],
     featuredProducts: [],
     selectedProduct: null,
@@ -14,13 +14,22 @@ export const useProductStore = create((set) => ({
         set({ loading: true });
         try {
             const res = await axios.post("/products", productData);
-            set((prevState) => ({
-                products: [...prevState.products, res.data],
-                loading: false,
-            }));
-        } catch (error) {
-            toast.error(error.response.data.error);
+            // refresh product lists from server to avoid stale state
+            try {
+                await get().fetchAllProducts();
+                await get().fetchFeaturedProducts();
+            } catch (e) {
+                // ignore refresh errors but keep the created product in state
+                set((prevState) => ({ products: [...prevState.products, res.data], loading: false }));
+                return res.data;
+            }
             set({ loading: false });
+            return res.data;
+        } catch (error) {
+            const msg = error?.response?.data?.error || error?.response?.data?.message || error.message || "Failed to create product";
+            toast.error(msg);
+            set({ loading: false });
+            throw error;
         }
     },
     fetchAllProducts: async () => {
