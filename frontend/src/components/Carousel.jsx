@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 
-
 export default function Carousel({ children, autoplay = false, interval = 5000, className = "" }) {
     const trackRef = useRef(null);
     const containerRef = useRef(null);
@@ -28,13 +27,19 @@ export default function Carousel({ children, autoplay = false, interval = 5000, 
             setPages(p);
             // adjust pageIndex if out of range
             setPageIndex((idx) => Math.min(idx, Math.max(0, p - 1)));
+            // ensure track starts scrolled to the left when layout changes
+            requestAnimationFrame(() => {
+                try {
+                    if (containerRef.current) containerRef.current.scrollTo({ left: 0 });
+                } catch (e) {}
+            });
         };
         compute();
         const ro = new ResizeObserver(compute);
         if (containerRef.current) ro.observe(containerRef.current);
         return () => ro.disconnect();
     }, [children]);
-    
+
     useEffect(() => {
         if (!autoplay) return;
         if (autoplayRef.current) clearInterval(autoplayRef.current);
@@ -47,8 +52,16 @@ export default function Carousel({ children, autoplay = false, interval = 5000, 
     const goToPage = (i) => {
         const c = containerRef.current;
         if (!c) return;
-        const left = i * c.clientWidth;
-        c.scrollTo({ left, behavior: "smooth" });
+        const t = trackRef.current;
+        // calculate scroll offset based on track scrollWidth divided by pages (more robust)
+        if (t && pages > 0) {
+            const pageWidth = t.scrollWidth / pages;
+            const left = Math.round(i * pageWidth);
+            c.scrollTo({ left, behavior: "smooth" });
+        } else {
+            const left = i * c.clientWidth;
+            c.scrollTo({ left, behavior: "smooth" });
+        }
         setPageIndex(i);
     };
 
@@ -63,7 +76,7 @@ export default function Carousel({ children, autoplay = false, interval = 5000, 
                 style={{ scrollSnapType: "x mandatory" }}>
                 <div
                     ref={trackRef}
-                    className="flex gap-4 px-2"
+                    className="flex gap-4"
                     style={{ overflowX: "auto", scrollSnapType: "x mandatory", scrollbarWidth: "none" }}>
                     {React.Children.map(children, (child, idx) => {
                         const pct = Math.max(1, itemsPerPage) > 0 ? `${100 / Math.max(1, itemsPerPage)}%` : undefined;
@@ -87,13 +100,15 @@ export default function Carousel({ children, autoplay = false, interval = 5000, 
             <button
                 onClick={prev}
                 aria-label="Previous"
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/40 text-white p-2 rounded-full hidden md:block">
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-50 bg-black/40 text-white p-2 rounded-full hidden md:block"
+                style={{ pointerEvents: "auto" }}>
                 ‹
             </button>
             <button
                 onClick={next}
                 aria-label="Next"
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/40 text-white p-2 rounded-full hidden md:block">
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-50 bg-black/40 text-white p-2 rounded-full hidden md:block"
+                style={{ pointerEvents: "auto" }}>
                 ›
             </button>
 

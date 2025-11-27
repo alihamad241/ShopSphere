@@ -30,7 +30,7 @@ const WishlistPage = () => {
                                 <li>
                                     <i className="fa fa-angle-right"></i>
                                 </li>
-                                <li>Shopping Cart</li>
+                                <li>Wishlist</li>
                             </ul>
                         </div>
                     </div>
@@ -51,7 +51,6 @@ const WishlistPage = () => {
                                             <th className="py-3">IMAGE</th>
                                             <th className="py-3">PRODUCT</th>
                                             <th className="py-3">PRICE</th>
-                                            <th className="py-3">STOCK STATUS</th>
                                             <th className="py-3">ACTION</th>
                                         </tr>
                                     </thead>

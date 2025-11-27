@@ -67,12 +67,13 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
     };
 
     return (
-        <section className="pos_home_section py-12">
-            <div className="mx-auto px-4">
-                <div className="flex flex-wrap -mx-4">
-                    <div className="w-full">
-                        <div
-                            className="banner_slider slider_two relative overflow-hidden"
+        <section className="pos_home_section py-8 md:py-12">
+            <div className="w-full">
+                <div className="mx-auto max-w-7xl px-0">
+                    <div className="flex flex-wrap -mx-4">
+                        <div className="w-full">
+                            <div
+                                className="banner_slider slider_two relative overflow-hidden w-full"
                             onMouseEnter={() => setIsPaused(true)}
                             onMouseLeave={() => setIsPaused(false)}
                             onTouchStart={handleTouchStart}
@@ -93,7 +94,7 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
                                     <div className="w-full">
                                         <div className="slider_content">
                                             <div
-                                                className="slider_content_inner max-w-xl text-center mx-auto py-24 text-white"
+                                                className="slider_content_inner max-w-xl text-center mx-auto py-20 md:py-24 text-white px-4"
                                                 style={{ pointerEvents: "auto" }}>
                                                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{slides[index].title}</h1>
                                                 <p className="mt-4">{slides[index].text}</p>
@@ -140,6 +141,7 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
                     </div>
                 </div>
             </div>
+        </div>
         </section>
     );
 }

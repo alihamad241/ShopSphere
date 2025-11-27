@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
@@ -13,6 +14,30 @@ export default function ShopPage() {
     }, [fetchAllProducts]);
 
     const list = products || [];
+    const location = useLocation();
+
+    function RouteViewToggle({ viewMode, setViewMode }) {
+        const pathname = location.pathname;
+        const gridActive = pathname === "/shop" || pathname === "/";
+        const listActive = pathname === "/shop/list";
+
+        return (
+            <div className="inline-flex items-center gap-2">
+                <Link
+                    to="/shop"
+                    onClick={() => setViewMode("grid")}
+                    className={`px-2 py-1 border rounded ${gridActive ? "bg-gray-200" : ""}`}>
+                    Grid
+                </Link>
+                <Link
+                    to="/shop/list"
+                    onClick={() => setViewMode("list")}
+                    className={`px-2 py-1 border rounded ${listActive ? "bg-gray-200" : ""}`}>
+                    List
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -54,16 +79,10 @@ export default function ShopPage() {
                                             <option>Product Name: Z-A</option>
                                         </select>
                                         <div className="view_switch inline-flex items-center">
-                                            <button
-                                                onClick={() => setViewMode("grid")}
-                                                className={`px-2 py-1 border rounded ${viewMode === "grid" ? "bg-gray-200" : ""}`}>
-                                                Grid
-                                            </button>
-                                            <button
-                                                onClick={() => setViewMode("list")}
-                                                className={`px-2 py-1 border rounded ${viewMode === "list" ? "bg-gray-200" : ""}`}>
-                                                List
-                                            </button>
+                                            <RouteViewToggle
+                                                viewMode={viewMode}
+                                                setViewMode={setViewMode}
+                                            />
                                         </div>
                                     </div>
                                 </div>

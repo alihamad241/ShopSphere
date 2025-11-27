@@ -12,8 +12,7 @@ export default function ProductCard({ product = null, image, title, price, href 
     const displayTitle = prod.name || prod.title || title;
 
     const { deleteProduct, toggleFeaturedProduct } = useProductStore();
-    const { addToCart } = useCartStore();
-    const { addToWishlist } = useCartStore();
+    const { addToCart, addToWishlist, removeFromWishlist, wishlist = [] } = useCartStore();
     const { user } = useUserStore();
 
     const handleAddToCart = async (e) => {
@@ -101,20 +100,31 @@ export default function ProductCard({ product = null, image, title, price, href 
                         />
                     </div>
                 )}
+                {/* wishlist indicator (small heart) */}
+                {productId && (
+                    <div className="absolute top-2 right-2">
+                        {(() => {
+                            const inWishlist = !!wishlist.find((p) => p._id === productId);
+                            return (
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (inWishlist) removeFromWishlist(productId);
+                                        else addToWishlist(prod);
+                                    }}
+                                    title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                                    className="bg-white p-1 rounded-full shadow">
+                                    <Heart className={`w-5 h-5 ${inWishlist ? "text-pink-500" : "text-gray-300"}`} />
+                                </button>
+                            );
+                        })()}
+                    </div>
+                )}
                 <div className="product_action absolute inset-x-2 -bottom-10 group-hover:bottom-2 transition-all duration-300 flex justify-center space-x-2">
                     <button
                         onClick={handleAddToCart}
                         className="bg-white text-sm px-3 py-1 rounded shadow">
                         Add to cart
-                    </button>
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            addToWishlist(prod);
-                        }}
-                        title="Add to wishlist"
-                        className="bg-white p-1 rounded shadow">
-                        <Heart className="w-4 h-4 text-pink-500" />
                     </button>
                     {user && user.role === "admin" && (
                         <div className="flex items-center space-x-2">
@@ -135,7 +145,7 @@ export default function ProductCard({ product = null, image, title, price, href 
                 </div>
             </div>
             <div className="product_content p-4">
-                <span className="product_price text-lg font-semibold text-gray-900">{prod.price || price}</span>
+                <span className="product_price text-lg font-semibold text-gray-900">${prod.price || price}</span>
                 <h3 className="product_title mt-2 text-sm">
                     <a
                         href={hrefTo}
