@@ -47,7 +47,7 @@ function App() {
                 <Routes>
                     <Route
                         path="/"
-                        element={<Index2 />}
+                        element={user ? <Index2 /> : <Login />}
                     />
                     <Route
                         path="/about"
@@ -55,7 +55,7 @@ function App() {
                     />
                     <Route
                         path="/product/:id"
-                        element={<SingleProduct />}
+                        element={user ? <SingleProduct /> : <Login />}
                     />
                     <Route
                         path="/cart"
@@ -79,19 +79,19 @@ function App() {
                     />
                     <Route
                         path="/shop"
-                        element={<ShopPage />}
+                        element={user ? <ShopPage /> : <Login />}
                     />
                     <Route
                         path="/shop/fullwidth"
-                        element={<ShopFullwidth />}
+                        element={user ? <ShopFullwidth /> : <Login />}
                     />
                     <Route
                         path="/shop/list"
-                        element={<ShopList />}
+                        element={user ? <ShopList /> : <Login />}
                     />
                     <Route
                         path="/shop/sidebar"
-                        element={<ShopSidebar />}
+                        element={user ? <ShopSidebar /> : <Login />}
                     />
                     <Route
                         path="/wishlist"

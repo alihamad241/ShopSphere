@@ -87,66 +87,6 @@ const MyAccountDashboard = () => {
                     </div>
 
 
-                    <div className={`flex-col ${activeTab === "downloads" ? "flex" : "hidden"}`}>
-                         <h3 className="text-2xl font-semibold text-gray-900 mb-6">Downloads</h3>
-
-                        <div className="bg-white w-full shadow-sm ring-1 ring-gray-900/5 rounded-lg overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-x divide-gray-300">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Product
-                                            </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Download date
-                                            </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Expires
-                                            </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Download
-                                            </th>
-                                           
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y-2 divide-gray-200">
-                                        {downloads.map((download) => (
-                                            <tr key={download.id} className="hover:bg-gray-50 transition-colors">
-                                                
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    {download.product}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium `}>
-                                                        {download.date}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {download.expire}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <a className="inline-flex items-center gap-1.5 text-pink-600 hover:text-pink-700 font-medium transition-colors" href="">
-                                                        
-                                                        Click here to download your File
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div className={` flex-col ${activeTab === "address" ? "flex" : "hidden"}`}>
-                        <p>The following addresses will be used on the checkout page by default.</p>
-                        <h3>Billing address</h3>
-                        <a href="/">Edit</a>
-                    </div>
-
-
                     <div className={` ${activeTab === "accountDetails" ? "flex" : "hidden"}`}>Account Details</div>
 
 
@@ -160,8 +100,6 @@ const MyAccountDashboard = () => {
 const tabs = [
     { id: "dashboard", label: "Dashboard" },
     { id: "orders", label: "Orders" },
-    { id: "downloads", label: "Downloads" },
-    { id: "address", label: "Addresses" },
     { id: "accountDetails", label: "Account Details" },
     { id: "logout", label: "Logout" },
 ];
@@ -183,18 +121,4 @@ const orders = [
     },
 ];
 
-const downloads = [
-    {
-        product: "Shopnovilla - Free Real Estate PSD Template",
-        date: "Aug 22, 2023",
-        expire: "Never",
-        download: "Click here to download your file",
-    },
-    {
-        product: "Ecomart - eCommerce HTML Template",
-        date: "Sep 12, 2023",
-        expire: "Never",
-        download: "Click here to download your file",
-    }
-];
 export default MyAccountDashboard;

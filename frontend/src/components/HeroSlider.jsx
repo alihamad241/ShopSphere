@@ -4,20 +4,20 @@ import { motion, AnimatePresence } from "framer-motion";
 const slides = [
     {
         id: 0,
-        title: "fashion for you",
-        text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque eligendi quia, ratione porro, nemo non.",
+        title: "Fashion For You",
+        text: "Discover our seasonal collection — effortless silhouettes and timeless pieces crafted for everyday wear.",
         image: "/assets/img/slider/slider_2.png",
     },
     {
         id: 1,
-        title: "fashion for you",
-        text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque eligendi quia, ratione porro, nemo non.",
-        image: "/assets/img/slider/slide_4.png",
+        title: "Fashion For You",
+        text: "Elevate your wardrobe with statement tops, tailored denim, and versatile outerwear for every occasion.",
+        image: "/assets/img/slider/slide_1.png",
     },
     {
         id: 2,
-        title: "fashion for you",
-        text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque eligendi quia, ratione porro, nemo non.",
+        title: "Fashion For You",
+        text: "Shop sustainable fabrics and modern cuts — quality you can feel and style you'll love season after season.",
         image: "/assets/img/slider/slider_3.png",
     },
 ];
@@ -46,8 +46,10 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
         return () => window.removeEventListener("keydown", onKey);
     }, []);
 
-    const paginate = (newDirection) => {
-        setPage(([p]) => [p + newDirection, newDirection]);
+    const paginate = (delta) => {
+        if (!delta) return;
+        const direction = delta > 0 ? 1 : -1;
+        setPage(([p]) => [p + delta, direction]);
     };
 
     // Simple swipe handling
@@ -81,7 +83,7 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
                                 <motion.div
                                     key={page}
                                     className="single_slider absolute inset-0 bg-center bg-cover flex items-center"
-                                    style={{ backgroundImage: `url(${slides[index].image})`, pointerEvents: 'none' }}
+                                    style={{ backgroundImage: `url(${slides[index].image})`, pointerEvents: "none" }}
                                     custom={direction}
                                     variants={variants}
                                     initial="enter"
@@ -90,7 +92,9 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
                                     transition={{ duration: 0.7 }}>
                                     <div className="w-full">
                                         <div className="slider_content">
-                                            <div className="slider_content_inner max-w-xl text-center mx-auto py-24 text-white" style={{ pointerEvents: 'auto' }}>
+                                            <div
+                                                className="slider_content_inner max-w-xl text-center mx-auto py-24 text-white"
+                                                style={{ pointerEvents: "auto" }}>
                                                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{slides[index].title}</h1>
                                                 <p className="mt-4">{slides[index].text}</p>
                                                 <a
@@ -123,7 +127,10 @@ export default function HeroSlider({ autoplay = true, interval = 8000 }) {
                                 {slides.map((s, i) => (
                                     <button
                                         key={s.id}
-                                        onClick={() => setPage([i, i > index ? 1 : -1])}
+                                        onClick={() => {
+                                            const delta = i - index;
+                                            if (delta !== 0) paginate(delta);
+                                        }}
                                         className={`w-3 h-3 rounded-full ${i === index ? "bg-white" : "bg-white/50"}`}
                                         aria-label={`Go to slide ${i + 1}`}
                                     />

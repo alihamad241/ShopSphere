@@ -4,7 +4,7 @@ import Carousel from "./Carousel";
 import { useProductStore } from "../stores/useProductStore";
 
 export default function FeaturedProducts() {
-    const { products: featured, fetchFeaturedProducts, loading } = useProductStore();
+    const { featuredProducts: featured, fetchFeaturedProducts, loading } = useProductStore();
 
     useEffect(() => {
         fetchFeaturedProducts();

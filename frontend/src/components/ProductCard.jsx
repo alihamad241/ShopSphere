@@ -2,7 +2,7 @@ import React from "react";
 import { useProductStore } from "../stores/useProductStore";
 import { useCartStore } from "../stores/useCartStore";
 import { useUserStore } from "../stores/useUserStore";
-import { Trash, Star } from "lucide-react";
+import { Trash, Star, Heart } from "lucide-react";
 
 export default function ProductCard({ product = null, image, title, price, href = "/product", badge, variant = "grid", onViewDetail }) {
     // support both flat props and product object
@@ -13,6 +13,7 @@ export default function ProductCard({ product = null, image, title, price, href 
 
     const { deleteProduct, toggleFeaturedProduct } = useProductStore();
     const { addToCart } = useCartStore();
+    const { addToWishlist } = useCartStore();
     const { user } = useUserStore();
 
     const handleAddToCart = async (e) => {
@@ -105,6 +106,15 @@ export default function ProductCard({ product = null, image, title, price, href 
                         onClick={handleAddToCart}
                         className="bg-white text-sm px-3 py-1 rounded shadow">
                         Add to cart
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            addToWishlist(prod);
+                        }}
+                        title="Add to wishlist"
+                        className="bg-white p-1 rounded shadow">
+                        <Heart className="w-4 h-4 text-pink-500" />
                     </button>
                     {user && user.role === "admin" && (
                         <div className="flex items-center space-x-2">

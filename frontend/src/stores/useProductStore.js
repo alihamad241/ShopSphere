@@ -4,9 +4,11 @@ import axios from "../libs/axios";
 
 export const useProductStore = create((set) => ({
     products: [],
+    featuredProducts: [],
     selectedProduct: null,
     loading: false,
     setProducts: (products) => set({ products }),
+    setFeaturedProducts: (featured) => set({ featuredProducts: featured }),
     setSelectedProduct: (product) => set({ selectedProduct: product }),
     createProduct: async (productData) => {
         set({ loading: true });
@@ -72,10 +74,21 @@ export const useProductStore = create((set) => ({
         set({ loading: true });
         try {
             const response = await axios.patch(`/products/${productId}`);
-            set((prevProducts) => ({
-                products: prevProducts.products.map((product) =>
-                    product._id === productId ? { ...product, isFeatured: response.data.isFeatured } : product
-                ),
+            // backend may return the updated product or an object with { product }
+            const updated = response.data.product || response.data;
+            const isFeatured = updated.isFeatured;
+            set((state) => ({
+                // update the global products list if present
+                products: state.products.map((product) => (product._id === productId ? updated : product)),
+                // update featuredProducts: add/update when featured, remove when not
+                featuredProducts: isFeatured
+                    ? (() => {
+                          const exists = state.featuredProducts.find((p) => p._id === productId);
+                          return exists
+                              ? state.featuredProducts.map((p) => (p._id === productId ? updated : p))
+                              : [...state.featuredProducts, updated];
+                      })()
+                    : state.featuredProducts.filter((p) => p._id !== productId),
                 loading: false,
             }));
         } catch (error) {}
@@ -84,8 +97,9 @@ export const useProductStore = create((set) => ({
         set({ loading: true });
         try {
             const response = await axios.get("/products/featured");
-            console.log(response.data);
-            set({ products: response.data, loading: false });
+            // accept either { products: [...] } or [...]
+            const data = response.data.products || response.data;
+            set({ featuredProducts: data, loading: false });
         } catch (error) {
             set({ error: "Failed to fetch products", loading: false });
             console.log("Error fetching featured products:", error);
