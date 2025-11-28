@@ -35,7 +35,7 @@ export default function About() {
             {/* Page Components */}
             <div className="space-y-20 py-16">
                 <AboutContent />
-                <CounterUp />
+                {/* <CounterUp /> */}
                 <ProgressBar />
                 <BrandLogo />
             </div>

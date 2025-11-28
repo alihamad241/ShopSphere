@@ -24,10 +24,14 @@ export default function ProgressBar() {
                         We have Skills to show
                     </h2>
                     <div className="pr-0 lg:pr-8">
-                        <SkillItem title="HTML/CSS" percentage={60} />
-                        <SkillItem title="Wordpress Theme" percentage={90} />
-                        <SkillItem title="Typography" percentage={70} />
-                        <SkillItem title="Branding" percentage={80} />
+                        <SkillItem title="Trend Curation" percentage={95} />
+                        <SkillItem title="Quality Assurance" percentage={100} />
+                        <SkillItem title="Global Logistics" percentage={90} />
+                        <SkillItem title="Vendor Support" percentage={98} />
+                        <SkillItem
+                            title="Sustainable Sourcing"
+                            percentage={85}
+                        />
                     </div>
                 </div>
 
@@ -35,8 +39,8 @@ export default function ProgressBar() {
                 <div className="w-full lg:w-1/2">
                     <div className="rounded-sm overflow-hidden">
                         <img
-                            src="/assets/img/ship/about3.jpg"
-                            alt="Skills"
+                            src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=2574&auto=format&fit=crop"
+                            alt="Fashion Team Collaborating"
                             className="w-full h-auto object-cover"
                         />
                     </div>
