@@ -1,55 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function ProductGallery({ product, loading }) {
-    const [activePic, setActivePic] = useState("p_tab1");
+    const [activePic, setActivePic] = useState(0);
 
-    const setPic = (id) => setActivePic(id);
+    // reset active picture when a different product is selected
+    useEffect(() => {
+        // prefer using product._id when available to avoid resetting on shallow prop changes
+        setActivePic(0);
+    }, [product?._id]);
 
+    // derive thumbnails from available product fields in priority order
     const thumbs = product
-        ? [product.image, product.image, product.image]
+        ? Array.isArray(product.images) && product.images.length
+            ? product.images
+            : Array.isArray(product.gallery) && product.gallery.length
+            ? product.gallery
+            : product.image
+            ? [product.image]
+            : []
         : ["/assets/img/cart/cart.jpg", "/assets/img/cart/cart2.jpg", "/assets/img/cart/cart4.jpg"];
-    const activeIndex = Math.max(0, parseInt(activePic.replace("p_tab", ""), 10) - 1 || 0);
-    const mainImage = thumbs[activeIndex] || thumbs[0] || "/assets/img/product/product13.jpg";
+
+    const safeActive = Math.max(0, Math.min(activePic, Math.max(0, thumbs.length - 1)));
+    const mainImage = thumbs[safeActive] || "/assets/img/product/product13.jpg";
+
+    if (loading && !product) {
+        return (
+            <div className="w-full px-4">
+                <div className="space-y-4 animate-pulse">
+                    <div className="h-16 w-full bg-gray-100 rounded" />
+                    <div className="h-64 w-full bg-gray-100 rounded" />
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="lg:w-5/12 md:w-1/2 w-full px-4">
+        <div className="w-full px-4">
             <div className="product_tab fix">
                 <div className="product_tab_button">
                     <ul
                         className="nav flex gap-2"
                         role="tablist">
-                        {thumbs.map((t, idx) => {
-                            const id = `p_tab${idx + 1}`;
-                            return (
-                                <li key={id}>
-                                    <button
-                                        type="button"
-                                        className={`inline-block ${activePic === id ? "outline-none ring-2 ring-blue-300" : ""}`}
-                                        onClick={() => setPic(id)}>
-                                        <img
-                                            src={t}
-                                            alt=""
-                                            className="rounded border h-16 object-cover"
-                                        />
-                                    </button>
-                                </li>
-                            );
-                        })}
+                        {thumbs.map((t, idx) => (
+                            <li key={`thumb-${idx}`}>
+                                <button
+                                    type="button"
+                                    className={`inline-block ${safeActive === idx ? "outline-none ring-2 ring-blue-300" : ""}`}
+                                    onClick={() => setActivePic(idx)}>
+                                    <img
+                                        src={t}
+                                        alt={product?.name || `thumb-${idx + 1}`}
+                                        className="rounded border h-16 object-cover"
+                                    />
+                                </button>
+                            </li>
+                        ))}
                     </ul>
                 </div>
+
                 <div className="tab-content produc_tab_c mt-4">
                     <div
                         className="tab-pane fade show active"
-                        id={activePic}
+                        id={`p_tab${safeActive + 1}`}
                         role="tabpanel">
                         <div className="modal_img relative">
-                            <a href="#">
-                                <img
-                                    src={mainImage}
-                                    alt={product?.name || "product image"}
-                                    className="w-full block rounded"
-                                />
-                            </a>
+                            <div className="bg-white p-6 border rounded flex items-center justify-center">
+                                <a
+                                    href="#"
+                                    className="w-full block">
+                                    <img
+                                        src={mainImage}
+                                        alt={product?.name || "product image"}
+                                        className="w-full h-96 object-contain mx-auto block"
+                                    />
+                                </a>
+                            </div>
                             <div className="img_icone absolute top-2 left-2">
                                 <img
                                     src="/assets/img/cart/span-new.png"

@@ -42,6 +42,14 @@ export default function ShopList() {
     }, [products, initialProducts]);
     const location = useLocation();
 
+    // pagination state
+    const [page, setPage] = useState(1);
+    const pageSize = 9;
+    const totalPages = Math.max(1, Math.ceil((list || []).length / pageSize));
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = Math.min(list.length, page * pageSize);
+    const currentItems = list.slice(startIndex, endIndex);
+
     function ViewToggle() {
         const pathname = location.pathname;
         const gridActive = pathname === "/shop" || pathname === "/";
@@ -92,7 +100,7 @@ export default function ShopList() {
                                 <div className="shop_toolbar mb-6 flex items-center justify-between">
                                     <div className="showing_results">
                                         <p className="text-sm text-gray-600">
-                                            Showing 1–{Math.min(9, list.length)} of {list.length} results
+                                            Showing {list.length === 0 ? 0 : startIndex + 1}–{endIndex} of {list.length} results
                                         </p>
                                     </div>
                                     <div className="shop_actions flex items-center gap-3">
@@ -109,30 +117,58 @@ export default function ShopList() {
                                 <div className="shop_products">
                                     <div className="space-y-6">
                                         {loading
-                                            ? Array.from({ length: 6 }).map((_, i) => (
+                                            ? Array.from({ length: pageSize }).map((_, i) => (
                                                   <div
                                                       key={i}
                                                       className="bg-gray-100 h-40 rounded"
                                                   />
                                               ))
-                                            : list.slice(0, 6).map((p) => (
+                                            : currentItems.map((p) => (
                                                   <ProductListCard
                                                       key={p._id}
                                                       product={p}
                                                   />
                                               ))}
                                     </div>
+
+                                    <div className="pagination mt-6 flex items-center justify-center">
+                                        <nav>
+                                            <ul className="inline-flex items-center gap-2">
+                                                <li>
+                                                    <button
+                                                        onClick={() => setPage((s) => Math.max(1, s - 1))}
+                                                        disabled={page === 1}
+                                                        className="px-3 py-1 border rounded">
+                                                        Prev
+                                                    </button>
+                                                </li>
+                                                {Array.from({ length: totalPages }).map((_, idx) => {
+                                                    const p = idx + 1;
+                                                    return (
+                                                        <li key={p}>
+                                                            <button
+                                                                onClick={() => setPage(p)}
+                                                                className={`px-3 py-1 border rounded ${p === page ? "bg-gray-100" : ""}`}>
+                                                                {p}
+                                                            </button>
+                                                        </li>
+                                                    );
+                                                })}
+                                                <li>
+                                                    <button
+                                                        onClick={() => setPage((s) => Math.min(totalPages, s + 1))}
+                                                        disabled={page === totalPages}
+                                                        className="px-3 py-1 border rounded">
+                                                        Next
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
                                 </div>
                             </div>
 
                             <aside className="w-full lg:w-3/12 px-4">
-                                <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
-                                    <h3 className="font-semibold mb-3">Filters</h3>
-                                    <div className="text-sm text-gray-700">
-                                        <p>Price range, categories, and attributes would go here.</p>
-                                    </div>
-                                </div>
-
                                 <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
                                     <h3 className="font-semibold mb-3">Categories</h3>
                                     <ul className="text-sm text-gray-700 space-y-2">

@@ -11,12 +11,10 @@ import Faq from "./pages/Faq.jsx";
 import MyAccount from "./pages/MyAccount.jsx";
 import ShopFullwidth from "./pages/ShopFullwidth.jsx";
 import ShopList from "./pages/ShopList.jsx";
-import ShopSidebar from "./pages/ShopSidebar.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import PurchaseSuccess from "./pages/PurchaseSuccess.jsx";
-import Header from "./components/Header.jsx";
 
 import { Toaster } from "react-hot-toast";
 
@@ -89,10 +87,6 @@ function App() {
                     <Route
                         path="/shop/list"
                         element={user ? <ShopList /> : <Login />}
-                    />
-                    <Route
-                        path="/shop/sidebar"
-                        element={user ? <ShopSidebar /> : <Login />}
                     />
                     <Route
                         path="/wishlist"
