@@ -44,7 +44,7 @@ const Contact = () => {
                                         <form
                                             id="contact-form"
                                             method="POST"
-                                            action="/assets/mail.php">
+                                            action="https://formspree.io/f/mrbwrzdy">
                                             <div className="row">
                                                 <div className="w-full lg:w-1/2 px-2 mb-4">
                                                     <input
@@ -93,7 +93,7 @@ const Contact = () => {
                                                     </div>
                                                     <button
                                                         type="submit"
-                                                        onClick={handeSubmit}
+                                                        // onClick={handeSubmit}
                                                         className="bg-blue-600 text-black px-4 py-2 rounded">
                                                         Send Message
                                                     </button>
