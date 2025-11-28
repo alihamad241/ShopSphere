@@ -88,10 +88,14 @@ export const useCouponStore = create((set, get) => ({
             await get().fetchCoupons();
             return res.data;
         } catch (err) {
-            const msg = err?.response?.data?.message || err?.message || "Failed to create coupon";
-            set({ adminError: msg });
-            toast.error(msg);
-            throw err;
+            const full = err?.response?.data || err;
+            const msg = full?.message || err?.message || "Failed to create coupon";
+            // surface full server response in console for debugging
+            console.error("createCoupon failed", { payload, fullResponse: full });
+            set({ adminError: typeof msg === "string" ? msg : JSON.stringify(msg) });
+            toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
+            // throw the full response object so callers can inspect details
+            throw full;
         } finally {
             set({ adminLoading: false });
         }

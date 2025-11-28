@@ -36,7 +36,7 @@ const AdminPage = () => {
 
     const [storeForm, setStoreForm] = useState({ name: "", description: "", image: "" });
     const [message, setMessage] = useState("");
-    const [couponForm, setCouponForm] = useState({ userId: "", code: "", discountPercentage: 10, isActive: true, expirationDate: "" });
+    const [couponForm, setCouponForm] = useState({ code: "", discountPercentage: 10, isActive: true, expirationDate: "" });
     const { user } = useUserStore();
 
     useEffect(() => {
@@ -127,11 +127,14 @@ const AdminPage = () => {
     const handleCreateCoupon = async (e) => {
         e.preventDefault();
         try {
-            const payload = { ...couponForm, userId: (user && user._id) || couponForm.userId };
+            const payload = { ...couponForm };
             await createCoupon(payload);
-            setCouponForm({ userId: "", code: "", discountPercentage: 10, expirationDate: "" });
+            setCouponForm({ code: "", discountPercentage: 10, expirationDate: "" });
         } catch (err) {
-            // errors already handled in store
+            // errors handled in store, but also log full response here for debugging
+            console.error("Admin create coupon error", err);
+            const errMsg = err?.message || (typeof err === "string" ? err : JSON.stringify(err));
+            toast.error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         }
     };
 
@@ -424,8 +427,7 @@ const AdminPage = () => {
                                                                                 {c.code} — {c.discountPercentage}%
                                                                             </div>
                                                                             <div className="text-sm text-gray-500">
-                                                                                User: {String(c.userId)} • Expires:{" "}
-                                                                                {new Date(c.expirationDate).toLocaleDateString()}
+                                                                                Expires: {new Date(c.expirationDate).toLocaleDateString()}
                                                                             </div>
                                                                         </div>
                                                                         <div>

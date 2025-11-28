@@ -21,11 +21,7 @@ const couponSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
+        // coupons are global and not tied to a specific user
     },
     {
         timestamps: true,

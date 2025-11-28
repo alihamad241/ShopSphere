@@ -4,6 +4,8 @@ import User from "../models/user.model.js";
 import { stripe } from "../libs/stripe.js";
 import mongoose from "mongoose";
 
+const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const createCheckoutSession = async (req, res) => {
     try {
         const { products, couponCode } = req.body;
@@ -47,11 +49,8 @@ export const createCheckoutSession = async (req, res) => {
 
         let coupon = null;
         if (couponCode) {
-            coupon = await Coupon.findOne({
-                code: couponCode,
-                userId: req.user._id,
-                isActive: true,
-            });
+            // case-insensitive exact match for coupon code (global coupons)
+            coupon = await Coupon.findOne({ code: { $regex: `^${escapeRegExp(String(couponCode).trim())}$`, $options: "i" }, isActive: true });
             if (coupon) {
                 totalAmount -= Math.round((totalAmount * coupon.discountPercentage) / 100);
             }
@@ -118,13 +117,8 @@ export const checkoutSuccess = async (req, res) => {
         if (session.payment_status === "paid") {
             if (session.metadata.couponCode) {
                 await Coupon.findOneAndUpdate(
-                    {
-                        code: session.metadata.couponCode,
-                        userId: session.metadata.userId,
-                    },
-                    {
-                        isActive: false,
-                    }
+                    { code: { $regex: `^${escapeRegExp(String(session.metadata.couponCode).trim())}$`, $options: "i" } },
+                    { isActive: false }
                 );
             }
 
@@ -188,13 +182,10 @@ export const stripeWebhook = async (req, res) => {
                 return res.status(200).send({ received: true });
             }
 
-            // Deactivate coupon if used
+            // Deactivate coupon if used (global lookup by code)
             if (session.metadata && session.metadata.couponCode) {
                 await Coupon.findOneAndUpdate(
-                    {
-                        code: session.metadata.couponCode,
-                        userId: session.metadata.userId,
-                    },
+                    { code: { $regex: `^${escapeRegExp(String(session.metadata.couponCode).trim())}$`, $options: "i" } },
                     { isActive: false }
                 );
             }
@@ -260,13 +251,10 @@ export const createOrderFromSession = async (req, res) => {
             });
         }
 
-        // Deactivate coupon if used
+        // Deactivate coupon if used (global lookup by code)
         if (session.metadata && session.metadata.couponCode) {
             await Coupon.findOneAndUpdate(
-                {
-                    code: session.metadata.couponCode,
-                    userId: session.metadata.userId,
-                },
+                { code: { $regex: `^${escapeRegExp(String(session.metadata.couponCode).trim())}$`, $options: "i" } },
                 { isActive: false }
             );
         }
@@ -318,17 +306,21 @@ async function createStripeCoupon(discountPercentage) {
     return coupon.id;
 }
 
-async function createNewCoupon(userId) {
-    await Coupon.findOneAndDelete({ userId });
-
-    const newCoupon = new Coupon({
-        code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
-        discountPercentage: 10,
-        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        userId: userId,
-    });
-
-    await newCoupon.save();
-
-    return newCoupon;
+async function createNewCoupon(/* userId */) {
+    // Create a global gift coupon. We intentionally do not attach a userId.
+    const code = "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const newCoupon = new Coupon({ code, discountPercentage: 10, expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) });
+    try {
+        await newCoupon.save();
+        return newCoupon;
+    } catch (err) {
+        // If code collision (unlikely), try again once
+        if (err && err.code === 11000) {
+            const code2 = "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const retry = new Coupon({ code: code2, discountPercentage: 10, expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) });
+            await retry.save();
+            return retry;
+        }
+        throw err;
+    }
 }

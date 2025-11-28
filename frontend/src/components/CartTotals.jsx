@@ -68,6 +68,14 @@ const CartTotals = () => {
                     <span>Flat Rate: ${formattedShipping}</span>
                 </div>
 
+                {/* Discount / Coupon */}
+                {coupon && coupon.discountPercentage ? (
+                    <div className="flex justify-between text-gray-700">
+                        <span className="font-bold">Discount ({coupon.code})</span>
+                        <span className="text-red-600">-${formattedSavings}</span>
+                    </div>
+                ) : null}
+
                 {/* Right-aligned Calculate Shipping above total */}
                 <p className="text-right text-sm text-red-600 cursor-pointer">Calculate shipping</p>
 

@@ -1,10 +1,11 @@
 import Coupon from "../models/coupon.model.js";
-import User from "../models/user.model.js";
+
+const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export const getCoupon = async (req, res) => {
     try {
-        // Return the most recent active coupon for this user (if any)
-        const coupon = await Coupon.findOne({ userId: req.user._id, isActive: true }).sort({ createdAt: -1 });
+        // Return the most recent active coupon (global)
+        const coupon = await Coupon.findOne({ isActive: true }).sort({ createdAt: -1 });
         res.json(coupon || null);
     } catch (error) {
         console.log("Error in getCoupon controller", error.message);
@@ -16,8 +17,9 @@ export const validateCoupon = async (req, res) => {
     try {
         const { code } = req.body;
         if (!code) return res.status(400).json({ message: "Code is required" });
-        const normalized = String(code).trim().toUpperCase();
-        const coupon = await Coupon.findOne({ code: normalized, userId: req.user._id, isActive: true });
+        const normalized = String(code).trim();
+        // use case-insensitive exact match to avoid issues with stored casing or invisible characters
+        const coupon = await Coupon.findOne({ code: { $regex: `^${escapeRegExp(normalized)}$`, $options: "i" }, isActive: true });
 
         if (!coupon) {
             return res.status(404).json({ message: "Coupon not found" });
@@ -42,18 +44,19 @@ export const validateCoupon = async (req, res) => {
 
 export const createCoupon = async (req, res) => {
     try {
-        const { userId, code, discountPercentage, expirationDate } = req.body;
+        const { code, discountPercentage, expirationDate } = req.body;
 
-        if (!userId || !code || !discountPercentage || !expirationDate) {
+        if (!code || !discountPercentage || !expirationDate) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        // ensure user exists
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
         // normalize and validate inputs
-        const normalizedCode = String(code).trim().toUpperCase();
+        // trim, remove common invisible/zero-width characters, then uppercase for storage
+        const normalizedCode = String(code)
+            .trim()
+            .replace(/[\u200B-\u200D\uFEFF]/g, "")
+            .toUpperCase();
+        console.info("createCoupon payload", { code: String(code), normalizedCode, discountPercentage, expirationDate });
         const discount = Number(discountPercentage);
         if (Number.isNaN(discount) || discount < 0 || discount > 100) {
             return res.status(400).json({ message: "discountPercentage must be a number between 0 and 100" });
@@ -66,27 +69,33 @@ export const createCoupon = async (req, res) => {
             return res.status(400).json({ message: "expirationDate must be in the future" });
         }
 
-        // ensure unique code only (normalized)
-        const existing = await Coupon.findOne({ code: normalizedCode });
+        // ensure unique code only (case-insensitive)
+        const existing = await Coupon.findOne({ code: { $regex: `^${escapeRegExp(normalizedCode)}$`, $options: "i" } });
         if (existing) {
-            return res.status(409).json({ message: "A coupon with this code already exists" });
+            console.warn("createCoupon: duplicate code detected", { normalizedCode, existingId: existing._id, existingCode: existing.code });
+            return res
+                .status(409)
+                .json({
+                    message: "A coupon with this code already exists",
+                    existing: { id: existing._id, code: existing.code, isActive: existing.isActive },
+                });
         }
 
-        const coupon = new Coupon({
-            userId,
-            code: normalizedCode,
-            discountPercentage: discount,
-            expirationDate: exp,
-            isActive: true,
-        });
+        const coupon = new Coupon({ code: normalizedCode, discountPercentage: discount, expirationDate: exp, isActive: true });
 
         try {
             await coupon.save();
             res.status(201).json(coupon);
         } catch (saveErr) {
             // handle duplicate key at DB level (race)
+            console.error(
+                "createCoupon save error",
+                saveErr && saveErr.code ? { code: saveErr.code, keyValue: saveErr.keyValue } : saveErr?.message || saveErr
+            );
             if (saveErr && saveErr.code === 11000) {
-                return res.status(409).json({ message: "A coupon with this code already exists" });
+                return res
+                    .status(409)
+                    .json({ message: "A coupon with this code already exists", dbError: { code: saveErr.code, keyValue: saveErr.keyValue } });
             }
             throw saveErr;
         }
@@ -109,10 +118,13 @@ export const listCoupons = async (req, res) => {
 export const deactivateCoupon = async (req, res) => {
     try {
         const { code } = req.params;
-        const normalized = String(code || "")
-            .trim()
-            .toUpperCase();
-        const coupon = await Coupon.findOneAndUpdate({ code: normalized }, { isActive: false }, { new: true });
+        const normalized = String(code || "").trim();
+        // .toUpperCase(); // Removed to allow case-insensitive regex
+        const coupon = await Coupon.findOneAndUpdate(
+            { code: { $regex: `^${escapeRegExp(normalized)}$`, $options: "i" } },
+            { isActive: false },
+            { new: true }
+        );
         if (!coupon) return res.status(404).json({ message: "Coupon not found" });
         res.json({ message: "Coupon deactivated", coupon });
     } catch (error) {
