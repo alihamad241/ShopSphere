@@ -48,7 +48,8 @@ export const getFeaturedProducts = async (req, res) => {
             return res.status(200).json([]);
         }
 
-        await redis.set("featured_products", JSON.stringify(featuredProducts)); // Cache for 1 hour
+        // Cache for 1 hour (set TTL) to avoid stale forever cache
+        await redis.set("featured_products", JSON.stringify(featuredProducts), "EX", 60 * 60);
         res.json(featuredProducts);
     } catch (error) {
         res.status(500).json({
@@ -132,7 +133,13 @@ export const deleteProduct = async (req, res) => {
             }
         }
 
+        const wasFeatured = !!product.isFeatured;
         await Product.findByIdAndDelete(req.params.id);
+
+        // If a featured product was removed, refresh the featured cache immediately
+        if (wasFeatured) {
+            await updateFeaturedProductsCache();
+        }
 
         res.json({ message: "Product deleted successfully" });
     } catch (error) {
@@ -202,7 +209,8 @@ async function updateFeaturedProductsCache() {
         const featuredProducts = await Product.find({
             isFeatured: true,
         }).lean();
-        await redis.set("featured_products", JSON.stringify(featuredProducts));
+        // Set with a TTL so the cache expires even if updates are missed
+        await redis.set("featured_products", JSON.stringify(featuredProducts), "EX", 60 * 60);
     } catch (error) {
         console.error("Error updating featured products cache:", error);
     }

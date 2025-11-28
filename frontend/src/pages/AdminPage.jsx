@@ -2,21 +2,27 @@ import { BarChart, PlusCircle, ShoppingBasket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import axios from "../libs/axios";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import AnalyticsTab from "../components/AnalyticsTab";
 import { useProductStore } from "../stores/useProductStore";
 import { useBrandStore } from "../stores/useBrandStore";
+import { useUserStore } from "../stores/useUserStore";
+import { useCouponStore } from "../stores/useCouponStore";
+import toast from "react-hot-toast";
 
 const tabs = [
     { id: "create", label: "Create Product", icon: PlusCircle },
     { id: "analytics", label: "Analytics", icon: BarChart },
+    { id: "coupons", label: "Coupons", icon: ShoppingBasket },
 ];
 
 const AdminPage = () => {
     const [activeTab, setActiveTab] = useState("create");
     const { fetchAllProducts, createProduct, loading } = useProductStore();
     const { fetchAllStores, createStore, deleteStore, stores, loading: storesLoading } = useBrandStore();
+    const { fetchCoupons, createCoupon, deleteCoupon, adminCoupons, adminLoading, adminError } = useCouponStore();
 
     const [productForm, setProductForm] = useState({
         name: "",
@@ -30,11 +36,18 @@ const AdminPage = () => {
 
     const [storeForm, setStoreForm] = useState({ name: "", description: "", image: "" });
     const [message, setMessage] = useState("");
+    const [couponForm, setCouponForm] = useState({ userId: "", code: "", discountPercentage: 10, isActive: true, expirationDate: "" });
+    const { user } = useUserStore();
 
     useEffect(() => {
         fetchAllProducts();
         fetchAllStores();
     }, [fetchAllProducts, fetchAllStores]);
+
+    // fetch coupons once on mount (admin)
+    useEffect(() => {
+        fetchCoupons();
+    }, []);
 
     const fileToDataUrl = (file) =>
         new Promise((resolve, reject) => {
@@ -52,7 +65,7 @@ const AdminPage = () => {
             setProductForm((s) => ({ ...s, image: dataUrl }));
         } catch (err) {
             console.error("File read error", err);
-            setMessage("Unable to read image file");
+            toast.error("Unable to read image file");
         }
     };
 
@@ -64,57 +77,70 @@ const AdminPage = () => {
             setStoreForm((s) => ({ ...s, image: dataUrl }));
         } catch (err) {
             console.error("File read error", err);
-            setMessage("Unable to read image file");
+            toast.error("Unable to read image file");
         }
     };
     const handleProductSubmit = async (e) => {
         e.preventDefault();
-        setMessage("");
         try {
             // use central product store to create product
             await createProduct(productForm);
-            setMessage("Product created");
+            toast.success("Product created");
             setProductForm({ name: "", description: "", price: "", image: "", category: "", gender: "", storeName: "" });
             // refresh products list
             fetchAllProducts();
         } catch (err) {
             console.error(err);
             // normalize error to a string to avoid React rendering objects
-            const errMsg =
-                err?.response?.data?.message ||
-                err?.response?.data ||
-                err?.message ||
-                "Error creating product";
-            setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
+            const errMsg = err?.response?.data?.message || err?.response?.data || err?.message || "Error creating product";
+            toast.error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         }
     };
 
     const handleStoreSubmit = async (e) => {
         e.preventDefault();
-        setMessage("");
         try {
             await createStore(storeForm);
-            setMessage("Store created");
+            toast.success("Store created");
             setStoreForm({ name: "", description: "", image: "" });
             await fetchAllStores();
         } catch (err) {
             console.error(err);
             const errMsg = err?.response?.data?.message || err?.response?.data || err?.message || "Error creating store";
-            setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
+            toast.error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         }
     };
 
     const handleDeleteStore = async (id) => {
         if (!confirm("Delete this store?")) return;
-        setMessage("");
         try {
             await deleteStore(id);
-            setMessage("Store deleted");
+            toast.success("Store deleted");
             await fetchAllStores();
         } catch (err) {
             console.error(err);
             const errMsg = err?.response?.data?.message || err?.response?.data || err?.message || "Error deleting store";
-            setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
+            toast.error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
+        }
+    };
+
+    const handleCreateCoupon = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = { ...couponForm, userId: (user && user._id) || couponForm.userId };
+            await createCoupon(payload);
+            setCouponForm({ userId: "", code: "", discountPercentage: 10, expirationDate: "" });
+        } catch (err) {
+            // errors already handled in store
+        }
+    };
+
+    const handleDeactivateCoupon = async (code) => {
+        if (!confirm("Deactivate this coupon?")) return;
+        try {
+            await deleteCoupon(code);
+        } catch (err) {
+            // errors already handled in store
         }
     };
 
@@ -338,6 +364,88 @@ const AdminPage = () => {
                                                 </div>
                                             )}
                                             {activeTab === "analytics" && <AnalyticsTab />}
+                                            {activeTab === "coupons" && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div className="p-6 bg-white rounded">
+                                                        <h3 className="text-lg font-semibold mb-3">Create Coupon</h3>
+                                                        <form
+                                                            onSubmit={handleCreateCoupon}
+                                                            className="space-y-3">
+                                                            <input
+                                                                value={couponForm.code}
+                                                                onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value })}
+                                                                placeholder="Coupon Code"
+                                                                className="w-full border px-3 py-2 rounded"
+                                                            />
+                                                            <input
+                                                                value={couponForm.discountPercentage}
+                                                                onChange={(e) =>
+                                                                    setCouponForm({ ...couponForm, discountPercentage: Number(e.target.value) })
+                                                                }
+                                                                placeholder="Discount Percentage"
+                                                                type="number"
+                                                                min={0}
+                                                                max={100}
+                                                                className="w-full border px-3 py-2 rounded"
+                                                            />
+                                                            <input
+                                                                value={couponForm.expirationDate}
+                                                                onChange={(e) => setCouponForm({ ...couponForm, expirationDate: e.target.value })}
+                                                                placeholder="Expiration Date"
+                                                                type="date"
+                                                                className="w-full border px-3 py-2 rounded"
+                                                            />
+                                                            <div className="flex justify-end">
+                                                                <button
+                                                                    type="submit"
+                                                                    className="bg-emerald-600 text-white px-4 py-2 rounded">
+                                                                    Create Coupon
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                    <div className="p-6 bg-white rounded">
+                                                        <h3 className="text-lg font-semibold mb-3">Existing Coupons</h3>
+                                                        {adminLoading ? (
+                                                            <div className="text-sm text-gray-600">Loading coupons...</div>
+                                                        ) : adminError ? (
+                                                            <div className="text-sm text-red-600">{adminError}</div>
+                                                        ) : adminCoupons.length === 0 ? (
+                                                            <div className="text-sm text-gray-600">No coupons found.</div>
+                                                        ) : (
+                                                            <ul className="space-y-2">
+                                                                {adminCoupons.map((c) => (
+                                                                    <li
+                                                                        key={c._id}
+                                                                        className="flex items-center justify-between border p-2 rounded">
+                                                                        <div>
+                                                                            <div className="font-medium">
+                                                                                {c.code} — {c.discountPercentage}%
+                                                                            </div>
+                                                                            <div className="text-sm text-gray-500">
+                                                                                User: {String(c.userId)} • Expires:{" "}
+                                                                                {new Date(c.expirationDate).toLocaleDateString()}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div>
+                                                                            {c.isActive ? (
+                                                                                <button
+                                                                                    onClick={() => handleDeactivateCoupon(c.code)}
+                                                                                    className="text-sm text-red-600">
+                                                                                    Deactivate
+                                                                                </button>
+                                                                            ) : (
+                                                                                <span className="text-sm text-gray-500">Inactive</span>
+                                                                            )}
+                                                                        </div>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </motion.div>
                                     </AnimatePresence>
                                 </div>

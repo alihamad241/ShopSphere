@@ -1,38 +1,37 @@
-import { redis } from '../libs/redis.js';
-import Product from '../models/product.model.js';
-import Store from '../models/store.model.js';
-import cloudinary from './../libs/cloudinary.js';
+import { redis } from "../libs/redis.js";
+import Product from "../models/product.model.js";
+import Store from "../models/store.model.js";
+import cloudinary from "./../libs/cloudinary.js";
 
 export const getAllStores = async (req, res) => {
     try {
         const stores = await Store.find({});
         res.status(200).json({ stores });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching products', error });
+        res.status(500).json({ message: "Error fetching products", error });
     }
 };
 
 export const getFeaturedStores = async (req, res) => {
     try {
-        const featuredStores = await redis.get('featured_stores');
-        if (featuredStores) {
-            return res.status(200).json(JSON.parse(featuredStores));
+        const cached = await redis.get("featured_stores");
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached));
         }
 
-        featuredStores = await Store.find({ isFeatured: true }).lean();
+        const featuredStores = await Store.find({ isFeatured: true }).lean();
 
         if (!featuredStores || featuredStores.length === 0) {
-            return res
-                .status(404)
-                .json({ message: 'No featured stores found' });
+            return res.status(200).json([]);
         }
 
-        await redis.set('featured_stores', JSON.stringify(featuredStores)); // Cache for 1 hour
+        // Cache results and set TTL for 1 hour
+        await redis.set("featured_stores", JSON.stringify(featuredStores), "EX", 60 * 60);
         res.json(featuredStores);
     } catch (error) {
         res.status(500).json({
-            message: 'Error fetching featured stores',
-            error
+            message: "Error fetching featured stores",
+            error,
         });
     }
 };
@@ -45,21 +44,19 @@ export const createStore = async (req, res) => {
 
         if (image) {
             cloudinaryResponse = await cloudinary.uploader.upload(image, {
-                folder: 'stores'
+                folder: "stores",
             });
         }
 
         const store = await Store.create({
             name,
             description,
-            logo_image: cloudinaryResponse?.secure_url
-                ? cloudinaryResponse.secure_url
-                : ''
+            logo_image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
         });
 
-        res.status(201).json( store );
+        res.status(201).json(store);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating store', error });
+        res.status(500).json({ message: "Error creating store", error });
     }
 };
 
@@ -68,24 +65,29 @@ export const deleteStore = async (req, res) => {
         const store = await Store.findById(req.params.id);
 
         if (!store) {
-            return res.status(404).json({ message: 'Store not found' });
+            return res.status(404).json({ message: "Store not found" });
         }
 
         if (store.image) {
-            const publicId = store.image.split('/').pop().split('.')[0];
+            const publicId = store.image.split("/").pop().split(".")[0];
             try {
                 await cloudinary.uploader.destroy(`stores/${publicId}`);
-                console.log('Image deleted from Cloudinary');
+                console.log("Image deleted from Cloudinary");
             } catch (error) {
-                console.error('Error deleting image from Cloudinary:', error);
+                console.error("Error deleting image from Cloudinary:", error);
             }
         }
 
+        const wasFeatured = !!store.isFeatured;
         await Store.findByIdAndDelete(req.params.id);
 
-        res.json({ message: 'Store deleted successfully' });
+        if (wasFeatured) {
+            await updateFeaturedStoresCache();
+        }
+
+        res.json({ message: "Store deleted successfully" });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting store', error });
+        res.status(500).json({ message: "Error deleting store", error });
     }
 };
 
@@ -93,7 +95,7 @@ export const getRecommendedStores = async (req, res) => {
     try {
         const stores = await Store.aggregate([
             {
-                $sample: { size: 10 }
+                $sample: { size: 10 },
             },
             {
                 $project: {
@@ -101,16 +103,16 @@ export const getRecommendedStores = async (req, res) => {
                     name: 1,
                     description: 1,
                     image: 1,
-                    price: 1
-                }
-            }
+                    price: 1,
+                },
+            },
         ]);
 
         res.json(stores);
     } catch (error) {
         res.status(500).json({
-            message: 'Error fetching recommended stores',
-            error
+            message: "Error fetching recommended stores",
+            error,
         });
     }
 };
@@ -120,11 +122,11 @@ export const getStoresByCategory = async (req, res) => {
     try {
         const stores = await Store.find({ category: category });
 
-        res.json( {stores} );
+        res.json({ stores });
     } catch (error) {
         res.status(500).json({
-            message: 'Error fetching stores by category',
-            error
+            message: "Error fetching stores by category",
+            error,
         });
     }
 };
@@ -138,20 +140,20 @@ export const toggleFeaturedStore = async (req, res) => {
             await updateFeaturedStoresCache();
             res.json(updatedStore);
         } else {
-            res.status(404).json({ message: 'Store not found' });
+            res.status(404).json({ message: "Store not found" });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Error updating store', error });
+        res.status(500).json({ message: "Error updating store", error });
     }
 };
 
 async function updateFeaturedStoresCache() {
     try {
         const featuredStores = await Store.find({
-            isFeatured: true
+            isFeatured: true,
         }).lean();
-        await redis.set('featured_stores', JSON.stringify(featuredStores));
+        await redis.set("featured_stores", JSON.stringify(featuredStores), "EX", 60 * 60);
     } catch (error) {
-        console.error('Error updating featured stores cache:', error);
+        console.error("Error updating featured stores cache:", error);
     }
 }

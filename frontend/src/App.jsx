@@ -8,7 +8,6 @@ import CartPage from "./pages/CartPage.jsx";
 import Contact from "./pages/Contact.jsx";
 import Faq from "./pages/Faq.jsx";
 import MyAccount from "./pages/MyAccount.jsx";
-import ShopFullwidth from "./pages/ShopFullwidth.jsx";
 import ShopList from "./pages/ShopList.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
@@ -74,10 +73,6 @@ function App() {
                     <Route
                         path="/shop"
                         element={user ? <ShopPage /> : <Login />}
-                    />
-                    <Route
-                        path="/shop/fullwidth"
-                        element={user ? <ShopFullwidth /> : <Login />}
                     />
                     <Route
                         path="/shop/list"

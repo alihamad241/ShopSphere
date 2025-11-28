@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 export const useCartStore = create((set, get) => ({
     cart: [],
     wishlist: [],
-    coupoun: null,
+    coupon: null,
     total: 0,
     subtotal: 0,
     isCouponApplied: false,
@@ -23,8 +23,10 @@ export const useCartStore = create((set, get) => ({
     },
 
     clearCart: async () => {
-        set({ cart: [], total: 0, subtotal: 0, coupon: null });
+        set({ cart: [], total: 0, subtotal: 0, coupon: null, isCouponApplied: false });
     },
+
+    // coupon is managed by useCouponStore now; cart store keeps `coupon`/`isCouponApplied` mirrored for totals
 
     addToCart: async (productOrId) => {
         try {
@@ -34,20 +36,12 @@ export const useCartStore = create((set, get) => ({
                 toast.error("Invalid product");
                 return;
             }
-            await axios.post("/cart", { productId });
+            const res = await axios.post("/cart", { productId });
             toast.success("Product added to cart");
 
-            // try to update local cart optimistically
-            set((prevState) => {
-                const existingProduct = prevState.cart.find((item) => item._id === productId);
-                const newCart = existingProduct
-                    ? prevState.cart.map((item) => (item._id === productId ? { ...item, quantity: item.quantity + 1 } : item))
-                    : // if we don't have product details, add a minimal placeholder; server refresh will populate
-                      [...prevState.cart, { _id: productId, quantity: 1 }];
-                return { cart: newCart };
-            });
-            // refresh server-backed cart to ensure populated product objects
-            await get().getCartItems();
+            // server returns populated cart items; update store directly
+            set({ cart: res.data });
+            get().calculateTotals();
         } catch (error) {
             toast.error(error.response?.data?.message || "Something went wrong, please try again.");
         }
@@ -55,10 +49,10 @@ export const useCartStore = create((set, get) => ({
 
     removeFromCart: async (productId) => {
         try {
-            await axios.delete(`/cart/`, { data: { productId } });
+            const res = await axios.delete(`/cart/`, { data: { productId } });
             toast.success("Product removed from cart");
-            // refresh cart from server to get populated product objects
-            await get().getCartItems();
+            set({ cart: res.data });
+            get().calculateTotals();
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to remove item from cart");
         }
@@ -66,9 +60,9 @@ export const useCartStore = create((set, get) => ({
 
     updateQuantity: async (productId, quantity) => {
         try {
-            await axios.put(`/cart/${productId}`, { quantity });
-            // refresh cart to get populated product objects and recalculate totals
-            await get().getCartItems();
+            const res = await axios.put(`/cart/${productId}`, { quantity });
+            set({ cart: res.data });
+            get().calculateTotals();
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update quantity");
         }
@@ -76,12 +70,13 @@ export const useCartStore = create((set, get) => ({
 
     calculateTotals: () => {
         const { cart, coupon } = get();
-        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        let total = subtotal;
-        if (coupon) {
-            const discount = subtotal * (coupon.discountPercentage / 100);
-            total = subtotal - discount;
+        const SHIPPING = 15; // flat shipping rate (dollars)
+        const subtotal = cart.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0);
+        let discount = 0;
+        if (coupon && coupon.discountPercentage) {
+            discount = subtotal * (coupon.discountPercentage / 100);
         }
+        const total = subtotal - discount + SHIPPING;
 
         set({ subtotal, total });
     },
