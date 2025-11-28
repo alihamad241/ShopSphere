@@ -3,10 +3,7 @@ import { motion } from "framer-motion";
 import { useCartStore } from "../stores/useCartStore";
 import { Link } from "react-router-dom";
 import { MoveRight } from "lucide-react";
-import { loadStripe } from "@stripe/stripe-js";
 import axios from "../libs/axios";
-
-const stripePromise = loadStripe("pk_test_51KZYccCoOZF2UhtOwdXQl3vcizup20zqKqT9hVUIsVzsdBrhqbUI2fE0ZdEVLdZfeHjeyFXtqaNsyCJCmZWnjNZa00PzMAjlcL");
 
 const CartTotals = () => {
     const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
@@ -21,24 +18,31 @@ const CartTotals = () => {
     const [processing, setProcessing] = useState(false);
 
     const handlePayment = async () => {
-        const stripe = await stripePromise;
         try {
             setProcessing(true);
+
+            // Build payload with quantities to match server expectations
+            const productsPayload = (cart || []).map((item) => ({
+                _id: item._id,
+                name: item.name || item.title,
+                image: item.image,
+                price: item.price,
+                quantity: item.quantity || 1,
+            }));
+
             const res = await axios.post("/payment/create-checkout-session", {
-                products: cart,
+                products: productsPayload,
                 couponCode: coupon ? coupon.code : null,
             });
 
-            const session = res.data;
-
-            const result = await stripe.redirectToCheckout({
-                sessionId: session.id,
-            });
-
-            if (result && result.error) {
-                console.error(result.error);
-                setProcessing(false);
+            if (res.data && res.data.url) {
+                // Redirect browser to Stripe hosted Checkout page (recommended)
+                window.location.href = res.data.url;
+                return;
             }
+
+            console.error("No checkout URL returned from server", res.data);
+            setProcessing(false);
         } catch (err) {
             console.error("Checkout error:", err);
             setProcessing(false);
