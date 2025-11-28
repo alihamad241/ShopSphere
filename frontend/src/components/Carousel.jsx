@@ -13,39 +13,44 @@ export default function Carousel({
     const autoplayRef = useRef(null);
     const [itemsPerPage, setItemsPerPage] = useState(1);
 
+    // Filter children to remove null/false/undefined (Fixes ghost element spacing)
+    const validChildren = React.Children.toArray(children).filter(Boolean);
+
     useEffect(() => {
         const compute = () => {
             const c = containerRef.current;
-            const t = trackRef.current;
-            if (!c || !t) return;
+            if (!c) return;
             const visibleW = c.clientWidth;
 
-            // determine items per page by breakpoints
+            // Determine items per page
             let per = 1;
             if (visibleW >= 1024) per = 4;
             else if (visibleW >= 768) per = 2;
             else per = 1;
             setItemsPerPage(per);
 
-            const childCount = React.Children.count(children) || 1;
+            const childCount = validChildren.length;
             const p = Math.max(1, Math.ceil(childCount / per));
             setPages(p);
-            // adjust pageIndex if out of range
+
+            // Reset to page 0 if out of bounds
             setPageIndex((idx) => Math.min(idx, Math.max(0, p - 1)));
-            // ensure track starts scrolled to the left when layout changes
-            requestAnimationFrame(() => {
-                try {
-                    // scroll the actual scrollable element (track)
-                    if (trackRef.current)
-                        trackRef.current.scrollTo({ left: 0 });
-                } catch (e) {}
-            });
         };
+
         compute();
         const ro = new ResizeObserver(compute);
         if (containerRef.current) ro.observe(containerRef.current);
+
         return () => ro.disconnect();
-    }, [children]);
+    }, [validChildren.length]); // Depend on the COUNT of valid children
+
+    // Force scroll reset when data changes (Fixes the whitespace on load issue)
+    useEffect(() => {
+        if (trackRef.current) {
+            trackRef.current.scrollTo({ left: 0, behavior: "auto" });
+            setPageIndex(0);
+        }
+    }, [validChildren.length]);
 
     useEffect(() => {
         if (!autoplay) return;
@@ -59,15 +64,9 @@ export default function Carousel({
     const goToPage = (i) => {
         const t = trackRef.current;
         if (!t) return;
-        // calculate scroll offset based on track scrollWidth divided by pages (more robust)
-        if (pages > 0) {
-            const pageWidth = t.scrollWidth / pages;
-            const left = Math.round(i * pageWidth);
-            t.scrollTo({ left, behavior: "smooth" });
-        } else {
-            const left = i * t.clientWidth;
-            t.scrollTo({ left, behavior: "smooth" });
-        }
+        const pageWidth = t.clientWidth;
+        const left = i * pageWidth;
+        t.scrollTo({ left, behavior: "smooth" });
         setPageIndex(i);
     };
 
@@ -75,30 +74,35 @@ export default function Carousel({
     const prev = () => goToPage(Math.max(0, pageIndex - 1));
 
     return (
-        <div className={`${className} relative`}>
+        <div className={`${className} relative group`}>
             <div
                 ref={containerRef}
-                className="overflow-hidden"
+                className="overflow-hidden w-full"
                 style={{ scrollSnapType: "x mandatory" }}>
                 <div
                     ref={trackRef}
-                    className="flex gap-4"
+                    // IMPORTANT: w-full ensures it spans the full container
+                    // justify-start ensures items start from the left, not centered
+                    className="flex w-full justify-start"
                     style={{
                         overflowX: "auto",
                         scrollSnapType: "x mandatory",
                         scrollbarWidth: "none",
+                        msOverflowStyle: "none", // IE/Edge hide scrollbar
                     }}>
-                    {React.Children.map(children, (child, idx) => {
+                    {validChildren.map((child, idx) => {
                         const pct =
-                            Math.max(1, itemsPerPage) > 0
-                                ? `${100 / Math.max(1, itemsPerPage)}%`
-                                : undefined;
+                            itemsPerPage > 0
+                                ? `${100 / itemsPerPage}%`
+                                : "100%";
                         return (
                             <div
+                                key={idx}
                                 style={{
                                     scrollSnapAlign: "start",
-                                    flex: pct ? `0 0 ${pct}` : "0 0 auto",
+                                    flex: `0 0 ${pct}`, // Shorthand for flex-grow, flex-shrink, flex-basis
                                     maxWidth: pct,
+                                    width: pct, // Force explicit width
                                     boxSizing: "border-box",
                                 }}
                                 className="shrink-0">
@@ -110,34 +114,54 @@ export default function Carousel({
             </div>
 
             {/* Arrows */}
-            <button
-                onClick={prev}
-                aria-label="Previous"
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-50 bg-black/40 text-white p-2 rounded-full hidden md:block"
-                style={{ pointerEvents: "auto" }}>
-                ‹
-            </button>
-            <button
-                onClick={next}
-                aria-label="Next"
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-50 bg-black/40 text-white p-2 rounded-full hidden md:block"
-                style={{ pointerEvents: "auto" }}>
-                ›
-            </button>
-
-            {/* Dots */}
-            <div className="absolute left-0 right-0 bottom-3 flex justify-center gap-2 z-10">
-                {Array.from({ length: pages }).map((_, i) => (
+            {pages > 1 && (
+                <>
                     <button
-                        key={i}
-                        onClick={() => goToPage(i)}
-                        className={`w-2 h-2 rounded-full ${
-                            i === pageIndex ? "bg-white" : "bg-white/50"
+                        onClick={prev}
+                        className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md transition-opacity duration-200 ${
+                            pageIndex === 0
+                                ? "opacity-0 pointer-events-none"
+                                : "opacity-100"
                         }`}
-                        aria-label={`Go to page ${i + 1}`}
-                    />
-                ))}
-            </div>
+                        aria-label="Previous">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="w-5 h-5">
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 19.5L8.25 12l7.5-7.5"
+                            />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={next}
+                        className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md transition-opacity duration-200 ${
+                            pageIndex === pages - 1
+                                ? "opacity-0 pointer-events-none"
+                                : "opacity-100"
+                        }`}
+                        aria-label="Next">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="w-5 h-5">
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                            />
+                        </svg>
+                    </button>
+                </>
+            )}
         </div>
     );
 }
