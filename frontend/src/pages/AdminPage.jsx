@@ -79,7 +79,13 @@ const AdminPage = () => {
             fetchAllProducts();
         } catch (err) {
             console.error(err);
-            setMessage(err?.response?.data?.message || "Error creating product");
+            // normalize error to a string to avoid React rendering objects
+            const errMsg =
+                err?.response?.data?.message ||
+                err?.response?.data ||
+                err?.message ||
+                "Error creating product";
+            setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         }
     };
 
@@ -93,7 +99,8 @@ const AdminPage = () => {
             await fetchAllStores();
         } catch (err) {
             console.error(err);
-            setMessage(err?.response?.data?.message || "Error creating store");
+            const errMsg = err?.response?.data?.message || err?.response?.data || err?.message || "Error creating store";
+            setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         }
     };
 
@@ -106,7 +113,8 @@ const AdminPage = () => {
             await fetchAllStores();
         } catch (err) {
             console.error(err);
-            setMessage(err?.response?.data?.message || "Error deleting store");
+            const errMsg = err?.response?.data?.message || err?.response?.data || err?.message || "Error deleting store";
+            setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         }
     };
 
