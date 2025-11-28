@@ -5,7 +5,6 @@ import SingleProduct from "./pages/SingleProduct.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Login from "./pages/Login.jsx";
 import CartPage from "./pages/CartPage.jsx";
-import Checkout from "./pages/Checkout.jsx";
 import Contact from "./pages/Contact.jsx";
 import Faq from "./pages/Faq.jsx";
 import MyAccount from "./pages/MyAccount.jsx";
@@ -59,10 +58,6 @@ function App() {
                     <Route
                         path="/cart"
                         element={user ? <CartPage /> : <Login />}
-                    />
-                    <Route
-                        path="/checkout"
-                        element={user ? <Checkout /> : <Login />}
                     />
                     <Route
                         path="/contact"
