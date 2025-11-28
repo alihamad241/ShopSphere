@@ -6,25 +6,43 @@ import { Plus, Minus, ChevronRight, Home } from "lucide-react";
 const faqData = [
     {
         id: 1,
-        question:
-            "Mauris congue euismod purus at semper. Morbi et vulputate massa?",
-        answer: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Donec mattis finibus elit ut tristique. Nullameritus.",
+        question: "How long does shipping take and how much does it cost?",
+        answer: "Standard shipping typically takes 3–7 business days within the continental US. Shipping cost is calculated at checkout based on your address and the items in your cart; free shipping promotions are applied automatically when eligible.",
     },
     {
         id: 2,
-        question: "Donec mattis finibus elit ut tristique?",
-        answer: "Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.",
+        question: "What is your return and exchange policy?",
+        answer: "We accept returns within 14 days of delivery for most unused items in original condition. Start a return from your account or contact support and we'll provide a prepaid return label when applicable. Exchanges are processed as a return plus a new order.",
     },
     {
         id: 3,
-        question:
-            "Aenean elit orci, efficitur sed nisl vitae, interdum maximus nisl?",
-        answer: "Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec sed odio dui.",
+        question: "Which payment methods do you accept?",
+        answer: "We accept major credit and debit cards (Visa, MasterCard, American Express), PayPal, and Apple Pay / Google Pay where available. All payments are processed securely.",
     },
     {
         id: 4,
-        question: "Pellentesque ornare sem lacinia quam venenatis vestibulum?",
-        answer: "Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.",
+        question: "How can I track my order?",
+        answer: "After your order ships you'll receive an email with tracking details. You can also view order status from your account's Orders page. If you don't receive tracking info, contact support with your order number.",
+    },
+    {
+        id: 5,
+        question: "Do you ship internationally?",
+        answer: "We ship to many countries worldwide. International shipping rates and delivery times vary by destination and will be shown at checkout. Import taxes or duties may apply and are the responsibility of the recipient.",
+    },
+    {
+        id: 6,
+        question: "How do promo codes and discounts work?",
+        answer: "Enter promo codes at checkout in the discount field. Only one promo code can be applied per order unless stated otherwise. Some promotions exclude sale items or certain categories — terms are shown with each offer.",
+    },
+    {
+        id: 7,
+        question: "My item is out of stock — can I be notified?",
+        answer: "If an item is out of stock you can sign up for a back-in-stock notification on the product page. We'll email you when the item is available again.",
+    },
+    {
+        id: 8,
+        question: "How do I contact customer support?",
+        answer: "You can reach our support team via the Contact page or by emailing support@yourdomain.com. Include your order number for fastest service; typical response time is within 24–48 hours.",
     },
 ];
 
