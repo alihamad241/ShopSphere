@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
 import { useProductStore } from "../stores/useProductStore";
@@ -18,7 +18,10 @@ export default function Header() {
             if (langRef.current && !langRef.current.contains(e.target)) {
                 setLangOpen(false);
             }
-            if (currencyRef.current && !currencyRef.current.contains(e.target)) {
+            if (
+                currencyRef.current &&
+                !currencyRef.current.contains(e.target)
+            ) {
                 setCurrencyOpen(false);
             }
         }
@@ -28,9 +31,13 @@ export default function Header() {
 
     const { user, checkingAuth, checkAuth, logout } = useUserStore();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { cart, subtotal, total, getCartItems } = useCartStore();
-    const itemCount = (cart || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+    const itemCount = (cart || []).reduce(
+        (sum, it) => sum + (it.quantity || 0),
+        0
+    );
 
     const { products, fetchAllProducts } = useProductStore();
     const [searchQuery, setSearchQuery] = useState("");
@@ -54,16 +61,23 @@ export default function Header() {
             }
         }
 
-        const local = (products || []).find((p) => p._id === q || (p.name || "").toLowerCase() === q.toLowerCase());
+        const local = (products || []).find(
+            (p) =>
+                p._id === q || (p.name || "").toLowerCase() === q.toLowerCase()
+        );
         if (local) {
             navigate(`/product/${local._id}`, { state: { product: local } });
             return;
         }
 
         // fallback: search by partial match (first match)
-        const partial = (products || []).find((p) => (p.name || "").toLowerCase().includes(q.toLowerCase()));
+        const partial = (products || []).find((p) =>
+            (p.name || "").toLowerCase().includes(q.toLowerCase())
+        );
         if (partial) {
-            navigate(`/product/${partial._id}`, { state: { product: partial } });
+            navigate(`/product/${partial._id}`, {
+                state: { product: partial },
+            });
             return;
         }
 
@@ -91,7 +105,9 @@ export default function Header() {
             }
 
             if (cancelled) return;
-            const list = (products || []).filter((p) => (p.name || "").toLowerCase().includes(q));
+            const list = (products || []).filter((p) =>
+                (p.name || "").toLowerCase().includes(q)
+            );
             setSuggestions(list.slice(0, 8));
         };
 
@@ -118,6 +134,9 @@ export default function Header() {
     }, [getCartItems]);
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Only render header for authenticated users
+    // if (!user) return null;
 
     return (
         <header>
@@ -235,13 +254,13 @@ export default function Header() {
                             <div className="lg:w-1/2 w-full px-4">
                                 <div className="header_links text-right">
                                     <ul>
-                                        <li>
+                                        {/* <li>
                                             <Link
                                                 to="/contact"
                                                 title="Contact">
                                                 Contact
                                             </Link>
-                                        </li>
+                                        </li> */}
                                         <li>
                                             <Link
                                                 to="/wishlist"
@@ -265,13 +284,13 @@ export default function Header() {
                                                 </Link>
                                             </li>
                                         )}
-                                        <li>
+                                        {/* <li>
                                             <Link
                                                 to="/cart"
                                                 title="My cart">
                                                 My cart
                                             </Link>
-                                        </li>
+                                        </li> */}
                                         <li>
                                             {user ? (
                                                 <a
@@ -281,9 +300,7 @@ export default function Header() {
                                                     Logout
                                                 </a>
                                             ) : (
-                                                <Link
-                                                    to="/login"
-                                                    title="Login">
+                                                <Link to="/login" title="Login">
                                                     Login
                                                 </Link>
                                             )}
@@ -306,7 +323,9 @@ export default function Header() {
                                             <button
                                                 aria-expanded={mobileMenuOpen}
                                                 aria-label="Toggle menu"
-                                                onClick={() => setMobileMenuOpen((v) => !v)}
+                                                onClick={() =>
+                                                    setMobileMenuOpen((v) => !v)
+                                                }
                                                 className="p-2 rounded bg-black/10">
                                                 <svg
                                                     className="w-6 h-6"
@@ -331,7 +350,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         Home
                                                     </Link>
@@ -339,7 +362,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/shop"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         Shop
                                                     </Link>
@@ -347,7 +374,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/about"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         About
                                                     </Link>
@@ -355,7 +386,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/contact"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         Contact
                                                     </Link>
@@ -363,7 +398,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/faq"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         FAQ
                                                     </Link>
@@ -371,7 +410,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/my-account"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         My Account
                                                     </Link>
@@ -379,7 +422,11 @@ export default function Header() {
                                                 <li>
                                                     <Link
                                                         to="/cart"
-                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        onClick={() =>
+                                                            setMobileMenuOpen(
+                                                                false
+                                                            )
+                                                        }
                                                         className="block px-2 py-2 text-gray-800">
                                                         Cart
                                                     </Link>
@@ -417,8 +464,14 @@ export default function Header() {
                                                 type="text"
                                                 autoComplete="off"
                                                 value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                onFocus={() => setShowSuggestions(true)}
+                                                onChange={(e) =>
+                                                    setSearchQuery(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onFocus={() =>
+                                                    setShowSuggestions(true)
+                                                }
                                                 className="border border-gray-300 rounded-l px-3 py-2 w-full"
                                             />
                                             <button
@@ -428,39 +481,77 @@ export default function Header() {
                                             </button>
                                         </form>
 
-                                        {showSuggestions && suggestions && suggestions.length > 0 && (
-                                            <div className="absolute left-0 right-0 mt-1 bg-white border rounded shadow z-50">
-                                                <ul className="divide-y">
-                                                    {suggestions.map((p) => (
-                                                        <li key={p._id}>
-                                                            <button
-                                                                type="button"
-                                                                onMouseDown={(e) => e.preventDefault()}
-                                                                onClick={() => {
-                                                                    setShowSuggestions(false);
-                                                                    setSearchQuery("");
-                                                                    navigate(`/product/${p._id}`, { state: { product: p } });
-                                                                }}
-                                                                className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-3">
-                                                                <img
-                                                                    src={p.image || "/assets/img/product/product13.jpg"}
-                                                                    alt={p.name}
-                                                                    className="w-10 h-10 object-cover rounded"
-                                                                />
-                                                                <div className="truncate">
-                                                                    <div className="font-medium">{p.name}</div>
-                                                                    <div className="text-sm text-gray-500">{p.category || ""}</div>
-                                                                </div>
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
+                                        {showSuggestions &&
+                                            suggestions &&
+                                            suggestions.length > 0 && (
+                                                <div className="absolute left-0 right-0 mt-1 bg-white border rounded shadow z-50">
+                                                    <ul className="divide-y">
+                                                        {suggestions.map(
+                                                            (p) => (
+                                                                <li key={p._id}>
+                                                                    <button
+                                                                        type="button"
+                                                                        onMouseDown={(
+                                                                            e
+                                                                        ) =>
+                                                                            e.preventDefault()
+                                                                        }
+                                                                        onClick={() => {
+                                                                            setShowSuggestions(
+                                                                                false
+                                                                            );
+                                                                            setSearchQuery(
+                                                                                ""
+                                                                            );
+                                                                            navigate(
+                                                                                `/product/${p._id}`,
+                                                                                {
+                                                                                    state: {
+                                                                                        product:
+                                                                                            p,
+                                                                                    },
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                        className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-3">
+                                                                        <img
+                                                                            src={
+                                                                                p.image ||
+                                                                                "/assets/img/product/product13.jpg"
+                                                                            }
+                                                                            alt={
+                                                                                p.name
+                                                                            }
+                                                                            className="w-10 h-10 object-cover rounded"
+                                                                        />
+                                                                        <div className="truncate">
+                                                                            <div className="font-medium">
+                                                                                {
+                                                                                    p.name
+                                                                                }
+                                                                            </div>
+                                                                            <div className="text-sm text-gray-500">
+                                                                                {p.category ||
+                                                                                    ""}
+                                                                            </div>
+                                                                        </div>
+                                                                    </button>
+                                                                </li>
+                                                            )
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         <div
-                                            onClick={() => setShowSuggestions(false)}
+                                            onClick={() =>
+                                                setShowSuggestions(false)
+                                            }
                                             className="absolute inset-0 pointer-events-none"
-                                            style={{ display: showSuggestions ? "block" : "none" }}
+                                            style={{
+                                                display: showSuggestions
+                                                    ? "block"
+                                                    : "none",
+                                            }}
                                         />
                                     </div>
                                     <div className="shopping_cart ml-4">
@@ -468,11 +559,19 @@ export default function Header() {
                                             to="/cart"
                                             className="inline-flex items-center text-gray-800">
                                             <i className="fa fa-shopping-cart mr-2"></i>
-                                            <span className="font-medium">{itemCount || 0} Items</span>
+                                            <span className="font-medium">
+                                                {itemCount || 0} Items
+                                            </span>
                                             <span className="mx-2">-</span>
                                             <span className="font-medium">
-                                                {selectedCurrency === "eur" ? "€" : "$"}
-                                                {(typeof total === "number" && total >= 0 ? total : subtotal || 0).toFixed(2)}
+                                                {selectedCurrency === "eur"
+                                                    ? "€"
+                                                    : "$"}
+                                                {(typeof total === "number" &&
+                                                total >= 0
+                                                    ? total
+                                                    : subtotal || 0
+                                                ).toFixed(2)}
                                             </span>
                                             <i className="fa fa-angle-down ml-2"></i>
                                         </Link>
@@ -491,21 +590,38 @@ export default function Header() {
                                     <div className="main_menu hidden lg:block">
                                         <nav>
                                             <ul className="flex items-center">
-                                                <li className="active">
+                                                <li
+                                                    className={
+                                                        location.pathname ===
+                                                        "/"
+                                                            ? "active"
+                                                            : ""
+                                                    }>
                                                     <Link
                                                         to="/"
                                                         className="text-white text-lg px-6 py-2">
                                                         HOME
                                                     </Link>
                                                 </li>
-                                                <li>
-                                                    <div className="mega_menu_link">
-                                                        <Link
+                                                <li
+                                                    className={
+                                                        location.pathname ===
+                                                        "/shop"
+                                                            ? "active"
+                                                            : ""
+                                                    }>
+                                                    <Link
+                                                        to="/shop"
+                                                        className="text-white text-lg px-6 py-2">
+                                                        SHOP
+                                                    </Link>
+                                                    {/* <div className="mega_menu_link"> */}
+                                                    {/* <Link 
                                                             to="/shop"
                                                             className="text-white hover:text-white focus:text-white active:text-white text-lg px-6 py-2">
                                                             SHOP
-                                                        </Link>
-                                                        <div className="mega_menu">
+                                                        </Link> */}
+                                                    {/* <div className="mega_menu">
                                                             <div className="mega_items">
                                                                 <ul>
                                                                     <li>
@@ -528,24 +644,36 @@ export default function Header() {
                                                                     </li>
                                                                 </ul>
                                                             </div>
-                                                        </div>
-                                                    </div>
+                                                        </div> */}
+                                                    {/* </div> */}
                                                 </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
+                                                <li
+                                                    className={
+                                                        location.pathname ===
+                                                        "/about"
+                                                            ? "active"
+                                                            : ""
+                                                    }>
+                                                    <Link
+                                                        to="/about"
                                                         className="text-white text-lg px-6 py-2">
-                                                        WOMEN
-                                                    </a>
+                                                        ABOUT US
+                                                    </Link>
                                                 </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
+                                                <li
+                                                    className={
+                                                        location.pathname ===
+                                                        "/faq"
+                                                            ? "active"
+                                                            : ""
+                                                    }>
+                                                    <Link
+                                                        to="/faq"
                                                         className="text-white text-lg px-6 py-2">
-                                                        MEN
-                                                    </a>
+                                                        FAQ
+                                                    </Link>
                                                 </li>
-                                                <li>
+                                                {/* <li>
                                                     <div className="mega_menu_link">
                                                         <a
                                                             href="#"
@@ -571,8 +699,14 @@ export default function Header() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </li>
-                                                <li>
+                                                </li> */}
+                                                <li
+                                                    className={
+                                                        location.pathname ===
+                                                        "/contact"
+                                                            ? "active"
+                                                            : ""
+                                                    }>
                                                     <Link
                                                         to="/contact"
                                                         className="text-white text-lg px-6 py-2">
