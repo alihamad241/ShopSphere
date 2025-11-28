@@ -124,9 +124,9 @@ export default function MyAccountDashboard({ onLogout }) {
                                     Edit account
                                 </button>
                                 <Link
-                                    to="/my-account?tab=orders"
+                                    // to="/my-account?tab=orders"
                                     onClick={() =>
-                                        navigate("/my-account?tab=orders")
+                                        setActiveTab("orders")
                                     }
                                     className="text-sm px-3 py-2 border rounded text-[#00BBA6] text-center">
                                     View orders
@@ -139,9 +139,8 @@ export default function MyAccountDashboard({ onLogout }) {
                         <div className="flex items-center justify-between mb-3">
                             <h4 className="font-semibold">Recent Orders</h4>
                             <Link
-                                to="/my-account?tab=orders"
                                 onClick={() =>
-                                    navigate("/my-account?tab=orders")
+                                    setActiveTab("orders")
                                 }
                                 className="text-sm text-[#00BBA6] hover:underline">
                                 See all
