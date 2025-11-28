@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,13 +7,39 @@ import ProductListCard from "../components/ProductListCard";
 import { useProductStore } from "../stores/useProductStore";
 
 export default function ShopList() {
-    const { products, fetchAllProducts, loading } = useProductStore();
+    const { products, fetchAllProducts, fetchFilteredProducts, loading } = useProductStore();
 
     useEffect(() => {
         fetchAllProducts();
     }, [fetchAllProducts]);
 
     const list = products || [];
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedGender, setSelectedGender] = useState("");
+    const [initialProducts, setInitialProducts] = useState([]);
+
+    const categories = useMemo(() => {
+        const set = new Set(initialProducts.map((p) => p.category || "").filter(Boolean));
+        return ["", ...Array.from(set)];
+    }, [initialProducts]);
+
+    const genders = useMemo(() => {
+        const set = new Set(initialProducts.map((p) => p.gender || "").filter(Boolean));
+        const arr = Array.from(set).map((g) => (g || "").toLowerCase());
+        return ["", ...arr];
+    }, [initialProducts]);
+
+    const applyFilters = async (category, gender) => {
+        setSelectedCategory(category || "");
+        setSelectedGender(gender || "");
+        await fetchFilteredProducts({ category: category || undefined, gender: gender || undefined });
+    };
+
+    useEffect(() => {
+        if ((!initialProducts || initialProducts.length === 0) && products && products.length > 0) {
+            setInitialProducts(products);
+        }
+    }, [products, initialProducts]);
     const location = useLocation();
 
     function ViewToggle() {
@@ -104,6 +130,39 @@ export default function ShopList() {
                                     <h3 className="font-semibold mb-3">Filters</h3>
                                     <div className="text-sm text-gray-700">
                                         <p>Price range, categories, and attributes would go here.</p>
+                                    </div>
+                                </div>
+
+                                <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
+                                    <h3 className="font-semibold mb-3">Categories</h3>
+                                    <ul className="text-sm text-gray-700 space-y-2">
+                                        {categories.map((c) => (
+                                            <li key={c || "all"}>
+                                                <button
+                                                    onClick={() => applyFilters(c || undefined, selectedGender || undefined)}
+                                                    className={`text-left w-full ${
+                                                        selectedCategory === c ? "font-semibold text-emerald-600" : "text-gray-700"
+                                                    }`}>
+                                                    {c === "" ? "All" : c}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
+                                    <h3 className="font-semibold mb-3">Filter by Gender</h3>
+                                    <div className="flex flex-col text-sm">
+                                        {genders.map((g) => (
+                                            <button
+                                                key={g || "allg"}
+                                                onClick={() => applyFilters(selectedCategory || undefined, g || undefined)}
+                                                className={`text-left py-1 ${
+                                                    selectedGender === g ? "font-semibold text-emerald-600" : "text-gray-700"
+                                                }`}>
+                                                {g === "" ? "All" : g.charAt(0).toUpperCase() + g.slice(1)}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             </aside>

@@ -124,30 +124,7 @@ export default function ShopSidebar() {
                                     </div>
                                 </div>
 
-                                <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
-                                    <h3 className="font-semibold mb-3">Special Products</h3>
-                                    <div className="space-y-3">
-                                        {[1, 2, 3].map((n) => (
-                                            <div
-                                                key={n}
-                                                className="flex items-center gap-3">
-                                                <img
-                                                    src={`/assets/img/product/product${n}.jpg`}
-                                                    alt=""
-                                                    className="w-16 h-16 object-cover rounded"
-                                                />
-                                                <div>
-                                                    <a
-                                                        href="/product"
-                                                        className="text-sm font-medium text-gray-800 hover:text-blue-600">
-                                                        Special {n}
-                                                    </a>
-                                                    <div className="text-sm text-gray-600">$29.00</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                {/* Special Products removed as requested */}
                             </aside>
                         </div>
                     </div>

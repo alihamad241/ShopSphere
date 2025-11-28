@@ -4,10 +4,14 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import { useProductStore } from "../stores/useProductStore";
+import { useMemo } from "react";
 
 export default function ShopPage() {
-    const { products, fetchAllProducts, loading } = useProductStore();
+    const { products, fetchAllProducts, fetchFilteredProducts, loading } = useProductStore();
     const [viewMode, setViewMode] = useState("grid");
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedGender, setSelectedGender] = useState("");
+    const [initialProducts, setInitialProducts] = useState([]);
 
     useEffect(() => {
         fetchAllProducts();
@@ -15,6 +19,32 @@ export default function ShopPage() {
 
     const list = products || [];
     const location = useLocation();
+
+    const categories = useMemo(() => {
+        const set = new Set(initialProducts.map((p) => p.category || "").filter(Boolean));
+        return ["", ...Array.from(set)];
+    }, [initialProducts]);
+
+    const genders = useMemo(() => {
+        const set = new Set(initialProducts.map((p) => p.gender || "").filter(Boolean));
+        // normalize genders to lowercase for matching
+        const arr = Array.from(set).map((g) => (g || "").toLowerCase());
+        return ["", ...arr];
+    }, [initialProducts]);
+
+    const applyFilters = async (category, gender) => {
+        setSelectedCategory(category || "");
+        setSelectedGender(gender || "");
+        // send category as-is; backend will filter by exact match
+        await fetchFilteredProducts({ category: category || undefined, gender: gender || undefined });
+    };
+
+    // capture initial full product list for building category/gender lists
+    useEffect(() => {
+        if ((!initialProducts || initialProducts.length === 0) && products && products.length > 0) {
+            setInitialProducts(products);
+        }
+    }, [products, initialProducts]);
 
     function RouteViewToggle({ viewMode, setViewMode }) {
         const pathname = location.pathname;
@@ -168,45 +198,38 @@ export default function ShopPage() {
                             <aside className="w-full lg:w-3/12 px-4">
                                 <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
                                     <h3 className="font-semibold mb-3">Categories</h3>
-                                    <ul className="text-sm text-gray-700">
-                                        <li>
-                                            <a href="#">Women</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Men</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Accessories</a>
-                                        </li>
+                                    <ul className="text-sm text-gray-700 space-y-2">
+                                        {categories.map((c) => (
+                                            <li key={c || "all"}>
+                                                <button
+                                                    onClick={() => applyFilters(c || undefined, selectedGender || undefined)}
+                                                    className={`text-left w-full ${
+                                                        selectedCategory === c ? "font-semibold text-emerald-600" : "text-gray-700"
+                                                    }`}>
+                                                    {c === "" ? "All" : c}
+                                                </button>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
 
-                                <div className="sidebar_widget bg-white rounded shadow-sm p-4">
-                                    <h3 className="font-semibold mb-3">Special Products</h3>
-                                    <div className="space-y-4">
-                                        {[3, 18].map((i) => (
-                                            <div
-                                                key={i}
-                                                className="special_product_inner flex items-center gap-3">
-                                                <a
-                                                    href="/product"
-                                                    className="block w-20 shrink-0">
-                                                    <img
-                                                        src={`/assets/img/cart/cart${i % 10}.jpg`}
-                                                        alt=""
-                                                        className="w-full h-20 object-cover rounded"
-                                                    />
-                                                </a>
-                                                <div>
-                                                    <h4 className="text-sm font-semibold">
-                                                        <a href="/product">Special Product</a>
-                                                    </h4>
-                                                    <div className="text-sm text-gray-600">$40.00</div>
-                                                </div>
-                                            </div>
+                                <div className="sidebar_widget mb-6 bg-white rounded shadow-sm p-4">
+                                    <h3 className="font-semibold mb-3">Filter by Gender</h3>
+                                    <div className="flex flex-col text-sm">
+                                        {genders.map((g) => (
+                                            <button
+                                                key={g || "allg"}
+                                                onClick={() => applyFilters(selectedCategory || undefined, g || undefined)}
+                                                className={`text-left py-1 ${
+                                                    selectedGender === g ? "font-semibold text-emerald-600" : "text-gray-700"
+                                                }`}>
+                                                {g === "" ? "All" : g.charAt(0).toUpperCase() + g.slice(1)}
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
+
+                                {/* Special Products removed as requested */}
                             </aside>
                         </div>
                     </div>

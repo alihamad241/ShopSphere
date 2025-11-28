@@ -6,6 +6,7 @@ import cloudinary from "./../libs/cloudinary.js";
 export const getAllProducts = async (req, res) => {
     try {
         const { storeName } = req.params;
+        const { category, gender } = req.query;
         let products;
 
         if (storeName) {
@@ -21,7 +22,11 @@ export const getAllProducts = async (req, res) => {
             // get products using the store's ObjectId
             products = await Product.find({ store: store._id });
         } else {
-            products = await Product.find({});
+            // support optional query filters
+            const filter = {};
+            if (category) filter.category = { $regex: `^${category}$`, $options: "i" };
+            if (gender) filter.gender = { $regex: `^${gender}$`, $options: "i" };
+            products = await Product.find(filter);
         }
 
         res.status(200).json({ products });
@@ -70,6 +75,15 @@ export const createProduct = async (req, res) => {
             name: { $regex: `^${storeName}$`, $options: "i" },
         });
 
+        // validate required inputs
+        if (!name || !description || !price || !category || !storeName) {
+            return res.status(400).json({ message: "Missing required product fields" });
+        }
+
+        if (!store) {
+            return res.status(400).json({ message: "Store not found" });
+        }
+
         const product = await Product.create({
             name,
             description,
@@ -77,12 +91,26 @@ export const createProduct = async (req, res) => {
             image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
             category,
             gender,
-            store,
+            store: store._id,
         });
 
-        res.status(201).json(product);
+        // if this product is featured, refresh the featured cache
+        if (product.isFeatured) {
+            await updateFeaturedProductsCache();
+        }
+
+        res.status(201).json({ product });
     } catch (error) {
-        res.status(500).json({ message: "Error creating product", error });
+        // Handle mongoose validation errors with a 400 and readable message
+        if (error && error.name === "ValidationError") {
+            const messages = Object.values(error.errors)
+                .map((e) => e.message)
+                .join(", ");
+            return res.status(400).json({ message: messages });
+        }
+
+        console.error("createProduct error:", error);
+        res.status(500).json({ message: "Error creating product", error: error?.message || error });
     }
 };
 
@@ -141,7 +169,8 @@ export const getRecommendedProducts = async (req, res) => {
 export const getProductsByCategory = async (req, res) => {
     const { category } = req.params;
     try {
-        const products = await Product.find({ category: category });
+        // case-insensitive match
+        const products = await Product.find({ category: { $regex: `^${category}$`, $options: "i" } });
 
         res.json({ products });
     } catch (error) {
