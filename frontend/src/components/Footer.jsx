@@ -3,7 +3,7 @@ import React from "react";
 export default function Footer() {
     return (
         <footer className="bg-[#00BBA6] text-gray-700">
-            <div className="mx-auto px-4 max-w-7xl py-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
+            <div className="mx-auto px-4 max-w-7xl py-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
                 <div className="max-w-sm text-sm">
                     <h4 className="font-semibold mb-2">About DEPI</h4>
                     <p className="text-sm">DEPI is a curated marketplace for unique products — quality, sustainability, and design.</p>
@@ -24,6 +24,26 @@ export default function Footer() {
                         </a>
                         <div className="text-xs text-gray-600 mt-1">19 Interpro Road Madison, AL 35758, USA</div>
                     </div>
+                </div>
+
+                <div className="text-sm">
+                    <h4 className="font-semibold mb-2">Pages</h4>
+                    <ul className="space-y-1">
+                        <li>
+                            <a
+                                href="/about"
+                                className="text-gray-700 hover:underline">
+                                About Us
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/faq"
+                                className="text-gray-700 hover:underline">
+                                FAQ
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
                 <div className="text-sm">

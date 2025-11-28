@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProductCard from "./ProductCard";
 import Carousel from "./Carousel";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function FeaturedProducts() {
-    const items = [
-        "/assets/img/product/product7.jpg",
-        "/assets/img/product/product8.jpg",
-        "/assets/img/product/product9.jpg",
-        "/assets/img/product/product3.jpg",
-    ];
+    const { featuredProducts: featured, fetchFeaturedProducts, loading } = useProductStore();
+
+    useEffect(() => {
+        fetchFeaturedProducts();
+    }, [fetchFeaturedProducts]);
+
     return (
         <div className="new_product_area product_two py-12">
             <div className="mx-auto px-4">
@@ -19,24 +20,39 @@ export default function FeaturedProducts() {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-wrap -mx-4">
-                    <div className="w-full px-2">
-                        <Carousel
-                            className="py-4"
-                            autoplay={false}>
-                            {items.map((src, i) => (
-                                <div
-                                    key={i}
-                                    className="px-2">
-                                    <ProductCard
-                                        image={src}
-                                        title={`Product #${i + 1}`}
-                                        price="$50.00"
-                                        href="/product"
-                                    />
-                                </div>
-                            ))}
-                        </Carousel>
+            </div>
+
+            <div className="w-full">
+                <div className="mx-auto max-w-7xl px-0">
+                    <div className="flex flex-wrap -mx-4">
+                        <div className="w-full px-2">
+                            <Carousel
+                                className="py-4"
+                                autoplay={false}>
+                                {loading &&
+                                    Array.from({ length: 4 }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="px-2">
+                                            <div className="bg-gray-100 w-full h-40 rounded" />
+                                        </div>
+                                    ))}
+
+                                {!loading &&
+                                    featured &&
+                                    featured.length > 0 &&
+                                    featured.map((p) => (
+                                        <div
+                                            key={p._id}
+                                            className="px-2">
+                                            <ProductCard
+                                                product={p}
+                                                href={`/product/${p._id}`}
+                                            />
+                                        </div>
+                                    ))}
+                            </Carousel>
+                        </div>
                     </div>
                 </div>
             </div>

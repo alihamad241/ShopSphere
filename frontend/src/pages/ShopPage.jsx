@@ -1,9 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function ShopPage() {
+    const { products, fetchAllProducts, loading } = useProductStore();
+    const [viewMode, setViewMode] = useState("grid");
+
+    useEffect(() => {
+        fetchAllProducts();
+    }, [fetchAllProducts]);
+
+    const list = products || [];
+    const location = useLocation();
+
+    function RouteViewToggle({ viewMode, setViewMode }) {
+        const pathname = location.pathname;
+        const gridActive = pathname === "/shop" || pathname === "/";
+        const listActive = pathname === "/shop/list";
+
+        return (
+            <div className="inline-flex items-center gap-2">
+                <Link
+                    to="/shop"
+                    onClick={() => setViewMode("grid")}
+                    className={`px-2 py-1 border rounded ${gridActive ? "bg-gray-200" : ""}`}>
+                    Grid
+                </Link>
+                <Link
+                    to="/shop/list"
+                    onClick={() => setViewMode("list")}
+                    className={`px-2 py-1 border rounded ${listActive ? "bg-gray-200" : ""}`}>
+                    List
+                </Link>
+            </div>
+        );
+    }
+
     return (
         <>
             <Header />
@@ -32,7 +67,9 @@ export default function ShopPage() {
                             <div className="w-full lg:w-9/12 px-4">
                                 <div className="shop_toolbar mb-6 flex items-center justify-between">
                                     <div className="showing_results">
-                                        <p className="text-sm text-gray-600">Showing 1–9 of 12 results</p>
+                                        <p className="text-sm text-gray-600">
+                                            Showing 1–{Math.min(9, list.length)} of {list.length} results
+                                        </p>
                                     </div>
                                     <div className="shop_actions flex items-center gap-3">
                                         <label className="text-sm text-gray-600">Sort By:</label>
@@ -42,25 +79,54 @@ export default function ShopPage() {
                                             <option>Product Name: Z-A</option>
                                         </select>
                                         <div className="view_switch inline-flex items-center">
-                                            <button className="px-2 py-1 border rounded">Grid</button>
-                                            <button className="px-2 py-1 border rounded">List</button>
+                                            <RouteViewToggle
+                                                viewMode={viewMode}
+                                                setViewMode={setViewMode}
+                                            />
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="shop_products">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                                            <ProductCard
-                                                key={i}
-                                                image={`/assets/img/product/product${i}.jpg`}
-                                                title={`Product ${i}`}
-                                                price="$50.00"
-                                                href="/product"
-                                                badge="/assets/img/cart/span-new.png"
-                                            />
-                                        ))}
-                                    </div>
+                                    {viewMode === "grid" ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {loading
+                                                ? Array.from({ length: 9 }).map((_, i) => (
+                                                      <div
+                                                          key={i}
+                                                          className="bg-gray-100 h-56 rounded"
+                                                      />
+                                                  ))
+                                                : list.slice(0, 9).map((p) => (
+                                                      <ProductCard
+                                                          key={p._id}
+                                                          product={p}
+                                                          href={`/product/${p._id}`}
+                                                          badge="/assets/img/cart/span-new.png"
+                                                      />
+                                                  ))}
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {loading
+                                                ? Array.from({ length: 6 }).map((_, i) => (
+                                                      <div
+                                                          key={i}
+                                                          className="bg-gray-100 h-36 rounded"
+                                                      />
+                                                  ))
+                                                : list.slice(0, 9).map((p) => (
+                                                      <div
+                                                          key={p._id}
+                                                          className="bg-white rounded shadow-sm p-4">
+                                                          <ProductCard
+                                                              product={p}
+                                                              href={`/product/${p._id}`}
+                                                              badge="/assets/img/cart/span-new.png"
+                                                          />
+                                                      </div>
+                                                  ))}
+                                        </div>
+                                    )}
 
                                     <div className="pagination mt-6 flex items-center justify-center">
                                         <nav>

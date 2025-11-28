@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ProductTabs() {
+export default function ProductTabs({ product = null }) {
     const [activeTab, setActiveTab] = useState("info");
 
     const setTab = (tab) => setActiveTab(tab);
@@ -53,8 +53,8 @@ export default function ProductTabs() {
                                         role="tabpanel">
                                         <div className="product_info_content text-gray-700">
                                             <p>
-                                                Fashion has been creating well-designed collections since 2010. The brand offers feminine designs
-                                                delivering stylish separates and statement dresses.
+                                                {product?.description ||
+                                                    "Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses."}
                                             </p>
                                         </div>
                                     </div>

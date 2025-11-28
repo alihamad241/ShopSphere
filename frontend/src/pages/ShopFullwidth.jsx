@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function ShopFullwidth() {
+    const { products, fetchAllProducts, loading } = useProductStore();
+
+    useEffect(() => {
+        fetchAllProducts();
+    }, [fetchAllProducts]);
+
+    const list = products || [];
+
     return (
         <>
             <Header />
@@ -43,16 +52,21 @@ export default function ShopFullwidth() {
 
                         <div className="shop_products">
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {Array.from({ length: 12 }).map((_, i) => (
-                                    <ProductCard
-                                        key={i}
-                                        image={`/assets/img/product/product${(i % 9) + 1}.jpg`}
-                                        title={`Fullwidth Product ${(i % 9) + 1}`}
-                                        price="$49.00"
-                                        href="/product"
-                                        badge="/assets/img/cart/span-new.png"
-                                    />
-                                ))}
+                                {loading
+                                    ? Array.from({ length: 12 }).map((_, i) => (
+                                          <div
+                                              key={i}
+                                              className="bg-gray-100 h-44 rounded"
+                                          />
+                                      ))
+                                    : list.slice(0, 12).map((p) => (
+                                          <ProductCard
+                                              key={p._id}
+                                              product={p}
+                                              href={`/product/${p._id}`}
+                                              badge="/assets/img/cart/span-new.png"
+                                          />
+                                      ))}
                             </div>
 
                             <div className="pagination mt-6 flex items-center justify-center">

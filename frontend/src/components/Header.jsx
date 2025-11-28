@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
+import { useCartStore } from "../stores/useCartStore";
 
 export default function Header() {
     const [selectedLang, setSelectedLang] = useState("en");
@@ -23,11 +24,28 @@ export default function Header() {
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
-    const { user, checkingAuth, checkAuth } = useUserStore();
+    const { user, checkingAuth, checkAuth, logout } = useUserStore();
+    const navigate = useNavigate();
+
+    const { cart, subtotal, total, getCartItems } = useCartStore();
+    const itemCount = (cart || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        await logout();
+        navigate("/");
+    };
 
     useEffect(() => {
         if (checkingAuth) checkAuth();
     }, []);
+
+    useEffect(() => {
+        // ensure cart is loaded on header mount
+        getCartItems();
+    }, [getCartItems]);
+
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
         <header>
@@ -36,7 +54,7 @@ export default function Header() {
                     <div className="mx-auto px-4">
                         <div className="flex flex-wrap items-center">
                             <div className="lg:w-1/2 w-full px-4">
-                                <div className="switcher">
+                                {/* <div className="switcher">
                                     <ul>
                                         <li
                                             className="languages mr-4"
@@ -140,7 +158,7 @@ export default function Header() {
                                             </ul>
                                         </li>
                                     </ul>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="lg:w-1/2 w-full px-4">
                                 <div className="header_links text-right">
@@ -183,20 +201,127 @@ export default function Header() {
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link
-                                                to="/login"
-                                                title="Login">
-                                                Login
-                                            </Link>
+                                            {user ? (
+                                                <a
+                                                    href="#"
+                                                    onClick={handleLogout}
+                                                    title="Logout">
+                                                    Logout
+                                                </a>
+                                            ) : (
+                                                <Link
+                                                    to="/login"
+                                                    title="Login">
+                                                    Login
+                                                </Link>
+                                            )}
                                         </li>
                                     </ul>
+                                </div>
+                                {/* Mobile menu toggle for small screens */}
+                                <div className="lg:hidden px-4 py-3 border-t border-gray-200/20">
+                                    <div className="mx-auto max-w-7xl flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <Link to="/">
+                                                <img
+                                                    src="/assets/img/logo/logo.jpg.png"
+                                                    alt=""
+                                                    className="w-28"
+                                                />
+                                            </Link>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                aria-expanded={mobileMenuOpen}
+                                                aria-label="Toggle menu"
+                                                onClick={() => setMobileMenuOpen((v) => !v)}
+                                                className="p-2 rounded bg-black/10">
+                                                <svg
+                                                    className="w-6 h-6"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M4 6h16M4 12h16M4 18h16"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {mobileMenuOpen && (
+                                        <nav className="mt-3 bg-white rounded shadow-sm p-3">
+                                            <ul className="space-y-2">
+                                                <li>
+                                                    <Link
+                                                        to="/"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        Home
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link
+                                                        to="/shop"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        Shop
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link
+                                                        to="/about"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        About
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link
+                                                        to="/contact"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        Contact
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link
+                                                        to="/faq"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        FAQ
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link
+                                                        to="/my-account"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        My Account
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link
+                                                        to="/cart"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="block px-2 py-2 text-gray-800">
+                                                        Cart
+                                                    </Link>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="header_middel">
+                <div className="header_middel hidden lg:block">
                     <div className="mx-auto px-4">
                         <div className="flex flex-wrap items-center">
                             <div className="lg:w-1/4 md:w-1/4 w-full px-4">
@@ -231,7 +356,14 @@ export default function Header() {
                                         <Link
                                             to="/cart"
                                             className="inline-flex items-center text-gray-800">
-                                            <i className="fa fa-shopping-cart mr-2"></i> 2Items - $209.44 <i className="fa fa-angle-down ml-2"></i>
+                                            <i className="fa fa-shopping-cart mr-2"></i>
+                                            <span className="font-medium">{itemCount || 0} Items</span>
+                                            <span className="mx-2">-</span>
+                                            <span className="font-medium">
+                                                {selectedCurrency === "eur" ? "€" : "$"}
+                                                {(typeof total === "number" && total >= 0 ? total : subtotal || 0).toFixed(2)}
+                                            </span>
+                                            <i className="fa fa-angle-down ml-2"></i>
                                         </Link>
                                     </div>
                                 </div>

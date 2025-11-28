@@ -16,9 +16,9 @@ export default function Index2() {
             <main>
                 <HeroSlider />
                 <NewProducts />
-                <BannerArea />
+                {/* <BannerArea /> */}
                 <FeaturedProducts />
-                <BlogArea />
+                {/* <BlogArea /> */}
                 <BrandLogo />
             </main>
             <Footer />

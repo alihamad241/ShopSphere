@@ -1,8 +1,8 @@
 import React from 'react'
-// import { useCartStore } from "../stores/useCartStore";
+import { useCartStore } from "../stores/useCartStore";
 
 const WishlistItem = ({item}) => {
-//  const { removeFromWishlist,addToCart } = useCartStore();
+ const { removeFromWishlist,addToCart } = useCartStore();
 
   return (
     <tr className="border border-gray-200 text-center font-bold">
@@ -19,14 +19,7 @@ const WishlistItem = ({item}) => {
         />
       </td>
       <td className="px-4 py-2 text-center border-r border-gray-200">{item.name}</td>
-      <td className="px-4 py-2 text-[#00BBA6] border-r border-gray-200">£{item.price.toFixed(2)}</td>
-      <td className="px-4 py-2 text-center border-r border-gray-200">
-        {item.inStock?(
-            <span className="text-[#333333] font-medium">In Stock</span>
-        ) : (
-            <span className="text-[#333333] font-medium">Out of Stock</span>
-        )}
-      </td>
+      <td className="px-4 py-2 text-[#00BBA6] border-r border-gray-200">${item.price.toFixed(2)}</td>
       <td className="px-4 py-2 text-[#00BBA6]">
         <button 
         onClick={()=>addToCart(item._id)}

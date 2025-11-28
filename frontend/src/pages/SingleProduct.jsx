@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductGallery from "../components/ProductGallery";
@@ -6,8 +6,44 @@ import ProductDetails from "../components/ProductDetails";
 import ProductTabs from "../components/ProductTabs";
 import RelatedProducts from "../components/RelatedProducts";
 import ProductModal from "../components/ProductModal";
+import { useParams } from "react-router-dom";
+import { useProductStore } from "../stores/useProductStore";
 
 export default function SingleProduct() {
+    const { id } = useParams();
+    const { products, fetchAllProducts, fetchProductById, loading } = useProductStore();
+    const [product, setProduct] = useState(null);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const load = async () => {
+            // prefer to load single product by id
+            if (id) {
+                const p = await fetchProductById(id);
+                if (mounted && p) {
+                    setProduct(p);
+                    return;
+                }
+            }
+
+            // fallback: ensure all products are loaded and pick
+            if (!products || !products.length) {
+                await fetchAllProducts();
+            }
+            if (mounted) {
+                const p2 = (products || []).find((x) => x._id === id);
+                if (p2) setProduct(p2);
+            }
+        };
+
+        load();
+
+        return () => {
+            mounted = false;
+        };
+    }, [id, products, fetchAllProducts, fetchProductById]);
+
     return (
         <>
             <Header />
@@ -23,7 +59,7 @@ export default function SingleProduct() {
                                     <li>
                                         <i className="fa fa-angle-right"></i>
                                     </li>
-                                    <li>single product</li>
+                                    <li>{product ? product.name : "single product"}</li>
                                 </ul>
                             </div>
                         </div>
@@ -33,15 +69,32 @@ export default function SingleProduct() {
 
             <div className="product_details">
                 <div className="mx-auto px-4">
-                    <div className="flex flex-wrap -mx-4">
-                        <ProductGallery />
-                        <ProductDetails />
+                    <div className="pos_page_inner">
+                        <div className="flex flex-wrap -mx-4">
+                            <div className="w-full lg:w-6/12 px-4">
+                                <ProductGallery
+                                    product={product}
+                                    loading={loading}
+                                />
+                            </div>
+                            <div className="w-full lg:w-6/12 px-4">
+                                <ProductDetails
+                                    product={product}
+                                    loading={loading}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <ProductTabs />
-            <RelatedProducts />
+            <div className="mx-auto px-4">
+                <div className="pos_page_inner">
+                    <ProductTabs product={product} />
+                    <RelatedProducts currentProduct={product} />
+                </div>
+            </div>
+
             <Footer />
             <ProductModal />
         </>
