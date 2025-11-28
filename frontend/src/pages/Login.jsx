@@ -1,10 +1,10 @@
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useUserStore } from "../stores/useUserStore";
 import { Loader } from "lucide-react"; // Assuming you have lucide-react installed
-
 
 const Login = () => {
     // --- State for Login Form ---
@@ -34,21 +34,14 @@ const Login = () => {
     return (
         <>
             <Header />
-            <div className="breadcrumbs_area">
-                <div className="mx-auto px-4">
-                    <div className="flex flex-wrap -mx-4">
-                        <div className="w-full">
-                            <div className="breadcrumb_content">
-                                <ul>
-                                    <li>
-                                        <a href="/">home</a>
-                                    </li>
-                                    <li>
-                                        <i className="fa fa-angle-right"></i>
-                                    </li>
-                                    <li>login</li>
-                                </ul>
-                            </div>
+            <div className="breadcrumbs_area bg-gray-50 py-12">
+                <div className="mx-auto px-4 max-w-4xl">
+                    <div className="flex items-center justify-center">
+                        <div className="w-full text-center">
+                            <p className="mt-3 text-gray-600">
+                                Access your account or create a new one to start
+                                shopping.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -98,14 +91,18 @@ const Login = () => {
                                                 "login"
                                             )}
                                         </button>
-                                        <label htmlFor="remember">
+                                        {/* <label htmlFor="remember">
                                             <input
                                                 id="remember"
                                                 type="checkbox"
                                             />
                                             Remember me
                                         </label>
-                                        <a href="#">Lost your password?</a>
+                                        <Link
+                                            to="/forgot-password"
+                                            className="text-blue-600 hover:underline">
+                                            Forgot your password?
+                                        </Link> */}
                                     </div>
                                 </form>
                             </div>
