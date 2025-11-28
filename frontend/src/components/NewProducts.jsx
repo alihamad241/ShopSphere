@@ -13,8 +13,10 @@ export default function NewProducts() {
     // show newest products by createdAt (descending). Be defensive for missing/invalid dates
     const newest = (products || [])
         .slice()
-        .sort((a, b) => (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0))
-        .slice(0, 4);
+        .sort(
+            (a, b) =>
+                (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0)
+        );
 
     return (
         <div className="new_product_area product_two py-12">
@@ -32,23 +34,17 @@ export default function NewProducts() {
                 <div className="mx-auto max-w-7xl px-0">
                     <div className="flex flex-wrap -mx-4">
                         <div className="w-full px-2">
-                            <Carousel
-                                className="py-4"
-                                autoplay={false}>
+                            <Carousel className="py-4" autoplay={false}>
                                 {loading &&
                                     Array.from({ length: 4 }).map((_, i) => (
-                                        <div
-                                            key={i}
-                                            className="px-2">
+                                        <div key={i} className="px-2">
                                             <div className="bg-gray-100 w-full h-40 rounded" />
                                         </div>
                                     ))}
 
                                 {!loading && newest.length > 0
                                     ? newest.map((p) => (
-                                          <div
-                                              key={p._id}
-                                              className="px-2">
+                                          <div key={p._id} className="px-2">
                                               <ProductCard
                                                   product={p}
                                                   href={`/product/${p._id}`}
@@ -57,9 +53,7 @@ export default function NewProducts() {
                                       ))
                                     : // show a friendly skeleton-style placeholder when there are no new products
                                       Array.from({ length: 4 }).map((_, i) => (
-                                          <div
-                                              key={i}
-                                              className="px-2">
+                                          <div key={i} className="px-2">
                                               <div className="single_product bg-white rounded shadow-sm overflow-hidden p-4">
                                                   <div className="product_thumb mb-3">
                                                       <div className="w-full h-40 bg-gray-100 rounded animate-pulse" />
