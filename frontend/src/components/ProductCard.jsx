@@ -5,7 +5,16 @@ import { useCartStore } from "../stores/useCartStore";
 import { useUserStore } from "../stores/useUserStore";
 import { Trash, Star, Heart } from "lucide-react";
 
-export default function ProductCard({ product = null, image, title, price, href = "/product", badge, variant = "grid", onViewDetail }) {
+export default function ProductCard({
+    product = null,
+    image,
+    title,
+    price,
+    href = "/product",
+    badge,
+    variant = "grid",
+    onViewDetail,
+}) {
     // support both flat props and product object
     const prod = product || { image, title, price };
     const productId = prod._id;
@@ -13,7 +22,12 @@ export default function ProductCard({ product = null, image, title, price, href 
     const displayTitle = prod.name || prod.title || title;
 
     const { deleteProduct, toggleFeaturedProduct } = useProductStore();
-    const { addToCart, addToWishlist, removeFromWishlist, wishlist = [] } = useCartStore();
+    const {
+        addToCart,
+        addToWishlist,
+        removeFromWishlist,
+        wishlist = [],
+    } = useCartStore();
     const { user } = useUserStore();
 
     const handleAddToCart = async (e) => {
@@ -34,9 +48,17 @@ export default function ProductCard({ product = null, image, title, price, href 
         if (!productId) return;
         await toggleFeaturedProduct(productId);
     };
+    const cardShadow = {
+        boxShadow: "0 6px 12px rgba(0,0,0,0.08), 0 -6px 10px rgba(0,0,0,0.04)",
+        borderTop: "1px solid rgba(0,0,0,0.08)",
+        borderBottom: "1px solid rgba(0,0,0,0.08)",
+    };
+
     if (variant === "list") {
         return (
-            <div className="product_list_item mb-6 bg-white rounded shadow-sm overflow-hidden flex flex-wrap">
+            <div
+                style={cardShadow}
+                className="product_list_item mb-6 bg-white rounded-xl shadow-sm overflow-hidden flex flex-wrap">
                 <div className="w-full md:w-1/3 lg:w-1/4 relative">
                     <Link
                         to={hrefTo}
@@ -67,12 +89,15 @@ export default function ProductCard({ product = null, image, title, price, href 
                             {displayTitle}
                         </Link>
                     </h3>
-                    <p className="text-sm text-gray-600 mt-2">This is a short description for the product, matching the list view structure.</p>
+                    <p className="text-sm text-gray-600 mt-2">
+                        This is a short description for the product, matching
+                        the list view structure.
+                    </p>
                     <div className="mt-4 flex items-center justify-between border-t pt-3">
-                        <span className="text-lg font-bold text-gray-900">{prod.price || price}</span>
-                        <a
-                            href="#"
-                            className="text-blue-600">
+                        <span className="text-lg font-bold text-gray-900">
+                            {prod.price || price}
+                        </span>
+                        <a href="#" className="text-blue-600">
                             Add to cart
                         </a>
                     </div>
@@ -83,12 +108,11 @@ export default function ProductCard({ product = null, image, title, price, href 
 
     // grid / default
     return (
-        <div className="single_product group bg-white rounded shadow-sm overflow-hidden relative">
+        <div
+            style={cardShadow}
+            className="single_product group bg-white rounded-xl shadow-sm overflow-hidden relative">
             <div className="product_thumb relative overflow-hidden">
-                <Link
-                    to={hrefTo}
-                    state={{ product: prod }}
-                    className="block">
+                <Link to={hrefTo} state={{ product: prod }} className="block">
                     <img
                         src={prod.image}
                         alt={displayTitle}
@@ -108,17 +132,30 @@ export default function ProductCard({ product = null, image, title, price, href 
                 {productId && (
                     <div className="absolute top-2 right-2">
                         {(() => {
-                            const inWishlist = !!wishlist.find((p) => p._id === productId);
+                            const inWishlist = !!wishlist.find(
+                                (p) => p._id === productId
+                            );
                             return (
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        if (inWishlist) removeFromWishlist(productId);
+                                        if (inWishlist)
+                                            removeFromWishlist(productId);
                                         else addToWishlist(prod);
                                     }}
-                                    title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                                    title={
+                                        inWishlist
+                                            ? "Remove from wishlist"
+                                            : "Add to wishlist"
+                                    }
                                     className="bg-white p-1 rounded-full shadow">
-                                    <Heart className={`w-5 h-5 ${inWishlist ? "text-pink-500" : "text-gray-300"}`} />
+                                    <Heart
+                                        className={`w-5 h-5 ${
+                                            inWishlist
+                                                ? "text-pink-500"
+                                                : "text-gray-300"
+                                        }`}
+                                    />
                                 </button>
                             );
                         })()}
@@ -149,7 +186,9 @@ export default function ProductCard({ product = null, image, title, price, href 
                 </div>
             </div>
             <div className="product_content p-4">
-                <span className="product_price text-lg font-semibold text-gray-900">${prod.price || price}</span>
+                <span className="product_price text-lg font-semibold text-gray-900">
+                    ${prod.price || price}
+                </span>
                 <h3 className="product_title mt-2 text-sm">
                     <Link
                         to={hrefTo}
