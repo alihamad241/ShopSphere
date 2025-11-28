@@ -110,18 +110,19 @@ const Contact = () => {
                                     <div className="contact_message contact_info">
                                         <h3>contact us</h3>
                                         <p>
-                                            Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare
-                                            quam littera gothica, quam nunc putamus parum claram anteposuerit litterarum formas human.
+                                            Need help or have a question about our products or your order? Use the form on the left to send us the details — include your order
+                                            number when relevant and a short description of the issue. Our support team monitors messages during business hours and will reply
+                                            within 24 business hours. For urgent inquiries, please call the phone number below during working hours.
                                         </p>
                                         <ul>
                                             <li>
                                                 <i className="fa fa-fax"></i> Address : No 40 Baria Sreet 133/2 NewYork City
                                             </li>
                                             <li>
-                                                <i className="fa fa-phone"></i> <a href="#">Infor@roadthemes.com</a>
+                                                <i className="fa fa-phone"></i> <a href="tel:+1234567890">+1 (234) 567-890</a>
                                             </li>
                                             <li>
-                                                <i className="fa fa-envelope-o"></i> 0(1234) 567 890
+                                                        <i className="fa fa-envelope-o"></i><a href="mailto:aliahmedfakhryhamad@gmail.com">aliahmedfakhryhamad@gmail.com</a>
                                             </li>
                                         </ul>
                                         <h3>
