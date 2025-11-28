@@ -3,16 +3,57 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useCartStore } from "../stores/useCartStore";
 import CartTotals from "../components/CartTotals";
+import axios from "../libs/axios";
+import { toast } from "react-hot-toast";
 
 export default function Checkout() {
-    const { cart, getCartItems, updateQuantity, removeFromCart, subtotal, total, loading } = useCartStore();
+    const { cart, getCartItems, updateQuantity, removeFromCart, subtotal, total, loading, coupoun } = useCartStore();
     const [billing, setBilling] = useState({ name: "", address: "", email: "" });
+
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
 
     useEffect(() => {
         getCartItems();
     }, [getCartItems]);
 
     const handleChange = (e) => setBilling((s) => ({ ...s, [e.target.name]: e.target.value }));
+
+    const handleCheckout = async () => {
+        if (!cart || cart.length === 0) {
+            toast.error("Your cart is empty.");
+            return;
+        }
+
+        setCheckoutLoading(true);
+        try {
+            const productsPayload = cart.map((item) => ({
+                _id: item._id,
+                name: item.name || item.title,
+                image: item.image,
+                price: item.price,
+                quantity: item.quantity || 1,
+            }));
+
+            const couponCode = coupoun?.code || null;
+
+            const res = await axios.post("/payment/create-checkout-session", {
+                products: productsPayload,
+                couponCode,
+            });
+
+            if (res.data && res.data.url) {
+                window.location.href = res.data.url;
+                return;
+            }
+
+            toast.error("Unable to start checkout. Please try again.");
+        } catch (err) {
+            console.error("Checkout error:", err);
+            toast.error(err?.response?.data?.message || "Failed to create checkout session");
+        } finally {
+            setCheckoutLoading(false);
+        }
+    };
 
     return (
         <>
@@ -124,6 +165,15 @@ export default function Checkout() {
                                 </div>
 
                                 <CartTotals />
+                                <div className="mt-4">
+                                    <button
+                                        onClick={handleCheckout}
+                                        disabled={checkoutLoading}
+                                        className="w-full bg-blue-600 text-white rounded py-2 px-4 hover:bg-blue-700"
+                                    >
+                                        {checkoutLoading ? 'Processing...' : 'Proceed to Payment'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

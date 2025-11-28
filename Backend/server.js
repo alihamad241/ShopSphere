@@ -20,12 +20,25 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+// Capture raw request body for Stripe webhook signature verification while
+// still parsing JSON for other routes. The `verify` option stores the raw
+// buffer on `req.rawBody`.
 
-app.use(express.json({ limit: "10mb" }));
-// parse urlencoded form bodies
+app.use(
+    express.json({
+        limit: '10mb',
+        verify: (req, _res, buf) => {
+            req.rawBody = buf;
+        }
+    })
+);
+
 app.use(express.urlencoded({ extended: true }));
 // enable CORS (use CLIENT_URL in .env when available)
 app.use(cors({ origin: process.env.CLIENT_URL || true, credentials: true }));
+
+
+
 app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);

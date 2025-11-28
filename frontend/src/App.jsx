@@ -14,6 +14,7 @@ import ShopList from "./pages/ShopList.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import PurchaseSuccess from "./pages/PurchaseSuccess.jsx";
 
 import { Toaster } from "react-hot-toast";
 
@@ -94,6 +95,10 @@ function App() {
                     <Route
                         path="/login"
                         element={<Login />}
+                    />
+                    <Route
+                        path="/purchase-success"
+                        element={<PurchaseSuccess />}
                     />
                     <Route
                         path="/admin"

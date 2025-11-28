@@ -70,7 +70,7 @@ const MyAccountDashboard = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {order.total}
+                                                    {order.totalAmount}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     <a className="inline-flex items-center gap-1.5 text-pink-600 hover:text-pink-700 font-medium transition-colors" href="">
