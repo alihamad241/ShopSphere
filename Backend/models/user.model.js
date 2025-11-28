@@ -44,6 +44,12 @@ const userSchema = new mongoose.Schema(
                 },
             }
         ],
+        orders: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Order",
+            }
+        ],
 		role: {
 			type: String,
 			enum: ["customer", "owner", "admin"],
