@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
+import { useProductStore } from "../stores/useProductStore";
+import toast from "react-hot-toast";
 
 export default function Header() {
     const [selectedLang, setSelectedLang] = useState("en");
@@ -29,6 +31,76 @@ export default function Header() {
 
     const { cart, subtotal, total, getCartItems } = useCartStore();
     const itemCount = (cart || []).reduce((sum, it) => sum + (it.quantity || 0), 0);
+
+    const { products, fetchAllProducts } = useProductStore();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const handleSearchSubmit = async (e) => {
+        e.preventDefault();
+        const q = (searchQuery || "").trim();
+        if (!q) {
+            navigate("/shop");
+            return;
+        }
+
+        // ensure we have products to search through
+        if (!products || !products.length) {
+            try {
+                await fetchAllProducts();
+            } catch (err) {
+                // fetchAllProducts already shows toast on error
+            }
+        }
+
+        const local = (products || []).find((p) => p._id === q || (p.name || "").toLowerCase() === q.toLowerCase());
+        if (local) {
+            navigate(`/product/${local._id}`, { state: { product: local } });
+            return;
+        }
+
+        // fallback: search by partial match (first match)
+        const partial = (products || []).find((p) => (p.name || "").toLowerCase().includes(q.toLowerCase()));
+        if (partial) {
+            navigate(`/product/${partial._id}`, { state: { product: partial } });
+            return;
+        }
+
+        toast.error("No product found matching your search");
+        navigate(`/shop?q=${encodeURIComponent(q)}`);
+    };
+
+    // update suggestions for partial matches as user types
+    useEffect(() => {
+        const q = (searchQuery || "").trim().toLowerCase();
+        if (!q) {
+            setSuggestions([]);
+            return;
+        }
+
+        let cancelled = false;
+
+        const ensureAndSearch = async () => {
+            if (!products || !products.length) {
+                try {
+                    await fetchAllProducts();
+                } catch (err) {
+                    // ignore; fetchAllProducts shows toast on error
+                }
+            }
+
+            if (cancelled) return;
+            const list = (products || []).filter((p) => (p.name || "").toLowerCase().includes(q));
+            setSuggestions(list.slice(0, 8));
+        };
+
+        ensureAndSearch();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [searchQuery, products, fetchAllProducts]);
 
     const handleLogout = async (e) => {
         e.preventDefault();
@@ -336,13 +408,17 @@ export default function Header() {
                             </div>
                             <div className="lg:w-3/4 md:w-3/4 w-full px-4">
                                 <div className="header_right_info">
-                                    <div className="search_bar">
+                                    <div className="search_bar relative">
                                         <form
-                                            action="#"
+                                            onSubmit={handleSearchSubmit}
                                             className="flex">
                                             <input
                                                 placeholder="Search..."
                                                 type="text"
+                                                autoComplete="off"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                onFocus={() => setShowSuggestions(true)}
                                                 className="border border-gray-300 rounded-l px-3 py-2 w-full"
                                             />
                                             <button
@@ -351,6 +427,41 @@ export default function Header() {
                                                 <i className="fa fa-search"></i>
                                             </button>
                                         </form>
+
+                                        {showSuggestions && suggestions && suggestions.length > 0 && (
+                                            <div className="absolute left-0 right-0 mt-1 bg-white border rounded shadow z-50">
+                                                <ul className="divide-y">
+                                                    {suggestions.map((p) => (
+                                                        <li key={p._id}>
+                                                            <button
+                                                                type="button"
+                                                                onMouseDown={(e) => e.preventDefault()}
+                                                                onClick={() => {
+                                                                    setShowSuggestions(false);
+                                                                    setSearchQuery("");
+                                                                    navigate(`/product/${p._id}`, { state: { product: p } });
+                                                                }}
+                                                                className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-3">
+                                                                <img
+                                                                    src={p.image || "/assets/img/product/product13.jpg"}
+                                                                    alt={p.name}
+                                                                    className="w-10 h-10 object-cover rounded"
+                                                                />
+                                                                <div className="truncate">
+                                                                    <div className="font-medium">{p.name}</div>
+                                                                    <div className="text-sm text-gray-500">{p.category || ""}</div>
+                                                                </div>
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                        <div
+                                            onClick={() => setShowSuggestions(false)}
+                                            className="absolute inset-0 pointer-events-none"
+                                            style={{ display: showSuggestions ? "block" : "none" }}
+                                        />
                                     </div>
                                     <div className="shopping_cart ml-4">
                                         <Link

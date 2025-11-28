@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useProductStore } from "../stores/useProductStore";
 import { useCartStore } from "../stores/useCartStore";
 import { useUserStore } from "../stores/useUserStore";
@@ -37,15 +38,16 @@ export default function ProductCard({ product = null, image, title, price, href 
         return (
             <div className="product_list_item mb-6 bg-white rounded shadow-sm overflow-hidden flex flex-wrap">
                 <div className="w-full md:w-1/3 lg:w-1/4 relative">
-                    <a
-                        href={hrefTo}
+                    <Link
+                        to={hrefTo}
+                        state={{ product: prod }}
                         className="block">
                         <img
                             src={prod.image}
                             alt={displayTitle}
                             className="w-full h-40 object-cover"
                         />
-                    </a>
+                    </Link>
                     {badge && (
                         <div className="absolute top-2 left-2 w-8 h-8 overflow-hidden">
                             <img
@@ -58,11 +60,12 @@ export default function ProductCard({ product = null, image, title, price, href 
                 </div>
                 <div className="w-full md:w-2/3 lg:w-3/4 p-4">
                     <h3 className="text-lg font-semibold">
-                        <a
-                            href={hrefTo}
+                        <Link
+                            to={hrefTo}
+                            state={{ product: prod }}
                             className="text-gray-800 hover:text-blue-600">
                             {displayTitle}
-                        </a>
+                        </Link>
                     </h3>
                     <p className="text-sm text-gray-600 mt-2">This is a short description for the product, matching the list view structure.</p>
                     <div className="mt-4 flex items-center justify-between border-t pt-3">
@@ -82,15 +85,16 @@ export default function ProductCard({ product = null, image, title, price, href 
     return (
         <div className="single_product group bg-white rounded shadow-sm overflow-hidden relative">
             <div className="product_thumb relative overflow-hidden">
-                <a
-                    href={hrefTo}
+                <Link
+                    to={hrefTo}
+                    state={{ product: prod }}
                     className="block">
                     <img
                         src={prod.image}
                         alt={displayTitle}
                         className="w-full h-44 object-cover transform transition-transform duration-300 group-hover:scale-105"
                     />
-                </a>
+                </Link>
                 {badge && (
                     <div className="absolute top-2 left-2 w-9 h-9 overflow-hidden">
                         <img
@@ -147,11 +151,12 @@ export default function ProductCard({ product = null, image, title, price, href 
             <div className="product_content p-4">
                 <span className="product_price text-lg font-semibold text-gray-900">${prod.price || price}</span>
                 <h3 className="product_title mt-2 text-sm">
-                    <a
-                        href={hrefTo}
+                    <Link
+                        to={hrefTo}
+                        state={{ product: prod }}
                         className="text-gray-800 hover:text-blue-600">
                         {displayTitle}
-                    </a>
+                    </Link>
                 </h3>
             </div>
         </div>
