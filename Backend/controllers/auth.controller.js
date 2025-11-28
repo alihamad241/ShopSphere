@@ -219,7 +219,6 @@ export const updateProfile = async (req, res) => {
     }
 };
 
-}
 
 export const getOrders = async (req, res) => {
     try {
