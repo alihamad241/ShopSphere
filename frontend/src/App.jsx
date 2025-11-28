@@ -5,17 +5,15 @@ import SingleProduct from "./pages/SingleProduct.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Login from "./pages/Login.jsx";
 import CartPage from "./pages/CartPage.jsx";
-import Checkout from "./pages/Checkout.jsx";
 import Contact from "./pages/Contact.jsx";
 import Faq from "./pages/Faq.jsx";
 import MyAccount from "./pages/MyAccount.jsx";
 import ShopFullwidth from "./pages/ShopFullwidth.jsx";
 import ShopList from "./pages/ShopList.jsx";
-import ShopSidebar from "./pages/ShopSidebar.jsx";
 import ShopPage from "./pages/ShopPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
-import Header from "./components/Header.jsx";
+import PurchaseSuccess from "./pages/PurchaseSuccess.jsx";
 
 import { Toaster } from "react-hot-toast";
 
@@ -62,10 +60,6 @@ function App() {
                         element={user ? <CartPage /> : <Login />}
                     />
                     <Route
-                        path="/checkout"
-                        element={user ? <Checkout /> : <Login />}
-                    />
-                    <Route
                         path="/contact"
                         element={<Contact />}
                     />
@@ -90,16 +84,16 @@ function App() {
                         element={user ? <ShopList /> : <Login />}
                     />
                     <Route
-                        path="/shop/sidebar"
-                        element={user ? <ShopSidebar /> : <Login />}
-                    />
-                    <Route
                         path="/wishlist"
                         element={user ? <WishlistPage /> : <Login />}
                     />
                     <Route
                         path="/login"
                         element={<Login />}
+                    />
+                    <Route
+                        path="/purchase-success"
+                        element={<PurchaseSuccess />}
                     />
                     <Route
                         path="/admin"

@@ -19,6 +19,12 @@ export default function ShopPage() {
 
     const list = products || [];
     const location = useLocation();
+    const [page, setPage] = useState(1);
+    const pageSize = 9;
+    const totalPages = Math.max(1, Math.ceil((list || []).length / pageSize));
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = Math.min(list.length, page * pageSize);
+    const currentItems = list.slice(startIndex, endIndex);
 
     const categories = useMemo(() => {
         const set = new Set(initialProducts.map((p) => p.category || "").filter(Boolean));
@@ -35,7 +41,8 @@ export default function ShopPage() {
     const applyFilters = async (category, gender) => {
         setSelectedCategory(category || "");
         setSelectedGender(gender || "");
-        // send category as-is; backend will filter by exact match
+        setPage(1);
+        // send category as-is; backend will filter by exact match (case-insensitive)
         await fetchFilteredProducts({ category: category || undefined, gender: gender || undefined });
     };
 
@@ -120,13 +127,13 @@ export default function ShopPage() {
                                     {viewMode === "grid" ? (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                             {loading
-                                                ? Array.from({ length: 9 }).map((_, i) => (
+                                                ? Array.from({ length: pageSize }).map((_, i) => (
                                                       <div
                                                           key={i}
                                                           className="bg-gray-100 h-56 rounded"
                                                       />
                                                   ))
-                                                : list.slice(0, 9).map((p) => (
+                                                : currentItems.map((p) => (
                                                       <ProductCard
                                                           key={p._id}
                                                           product={p}
@@ -138,13 +145,13 @@ export default function ShopPage() {
                                     ) : (
                                         <div className="space-y-4">
                                             {loading
-                                                ? Array.from({ length: 6 }).map((_, i) => (
+                                                ? Array.from({ length: pageSize }).map((_, i) => (
                                                       <div
                                                           key={i}
                                                           className="bg-gray-100 h-36 rounded"
                                                       />
                                                   ))
-                                                : list.slice(0, 9).map((p) => (
+                                                : currentItems.map((p) => (
                                                       <div
                                                           key={p._id}
                                                           className="bg-white rounded shadow-sm p-4">
@@ -162,32 +169,32 @@ export default function ShopPage() {
                                         <nav>
                                             <ul className="inline-flex items-center gap-2">
                                                 <li>
-                                                    <a
-                                                        href="#"
+                                                    <button
+                                                        onClick={() => setPage((s) => Math.max(1, s - 1))}
+                                                        disabled={page === 1}
                                                         className="px-3 py-1 border rounded">
                                                         Prev
-                                                    </a>
+                                                    </button>
                                                 </li>
+                                                {Array.from({ length: totalPages }).map((_, idx) => {
+                                                    const p = idx + 1;
+                                                    return (
+                                                        <li key={p}>
+                                                            <button
+                                                                onClick={() => setPage(p)}
+                                                                className={`px-3 py-1 border rounded ${p === page ? "bg-gray-100" : ""}`}>
+                                                                {p}
+                                                            </button>
+                                                        </li>
+                                                    );
+                                                })}
                                                 <li>
-                                                    <a
-                                                        href="#"
-                                                        className="px-3 py-1 border rounded bg-gray-100">
-                                                        1
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
-                                                        className="px-3 py-1 border rounded">
-                                                        2
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
+                                                    <button
+                                                        onClick={() => setPage((s) => Math.min(totalPages, s + 1))}
+                                                        disabled={page === totalPages}
                                                         className="px-3 py-1 border rounded">
                                                         Next
-                                                    </a>
+                                                    </button>
                                                 </li>
                                             </ul>
                                         </nav>

@@ -218,3 +218,14 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+}
+
+export const getOrders = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate('orders');
+        res.status(200).json(user.orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

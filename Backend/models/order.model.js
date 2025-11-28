@@ -27,11 +27,16 @@ const orderSchema = new mongoose.Schema(
 			required: true,
 		},
 
+        date: {
+            type: Date,
+            default: Date.now,
+        },
+
 		// single store per order (Talabat-style)
 		store: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Store",
-			required: true,
+			required: false,
 		},
 
 		// items (products + quantity + price at checkout)
@@ -44,6 +49,11 @@ const orderSchema = new mongoose.Schema(
 			min: 0,
 		},
 
+        address: {
+            type: String,
+            required: false,
+        },
+
 		// order status workflow
 		status: {
 			type: String,
@@ -55,26 +65,6 @@ const orderSchema = new mongoose.Schema(
 				"completed",
 				"cancelled",
 			],
-			default: "pending",
-		},
-
-		// address for delivery
-		address: {
-			type: String,
-			required: true,
-		},
-
-		// payment method used
-		paymentMethod: {
-			type: String,
-			enum: ["cash", "card"],
-			default: "cash",
-		},
-
-		// status of the payment
-		paymentStatus: {
-			type: String,
-			enum: ["pending", "paid", "failed"],
 			default: "pending",
 		},
 
