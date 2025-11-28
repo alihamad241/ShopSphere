@@ -12,6 +12,11 @@ export default function Carousel({
     const [pageIndex, setPageIndex] = useState(0);
     const autoplayRef = useRef(null);
     const [itemsPerPage, setItemsPerPage] = useState(1);
+    const [isDragging, setIsDragging] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const pointerIdRef = useRef(null);
+    const dragStartX = useRef(0);
+    const dragStartScroll = useRef(0);
 
     // Filter children to remove null/false/undefined (Fixes ghost element spacing)
     const validChildren = React.Children.toArray(children).filter(Boolean);
@@ -19,7 +24,8 @@ export default function Carousel({
     useEffect(() => {
         const compute = () => {
             const c = containerRef.current;
-            if (!c) return;
+            const t = trackRef.current;
+            if (!c || !t) return;
             const visibleW = c.clientWidth;
 
             // Determine items per page
@@ -29,12 +35,25 @@ export default function Carousel({
             else per = 1;
             setItemsPerPage(per);
 
-            const childCount = validChildren.length;
+            const childCount = validChildren.length || 1;
             const p = Math.max(1, Math.ceil(childCount / per));
             setPages(p);
 
-            // Reset to page 0 if out of bounds
-            setPageIndex((idx) => Math.min(idx, Math.max(0, p - 1)));
+            // clamp current index to available children
+            setCurrentIndex((ci) => Math.min(ci, Math.max(0, childCount - 1)));
+            // update page index so dots/pages remain consistent
+            setPageIndex((ci) => Math.min(ci, Math.max(0, p - 1)));
+
+            // ensure track starts scrolled to the left when layout changes
+
+            requestAnimationFrame(() => {
+                try {
+                    // scroll the actual scrollable element (track)
+
+                    if (trackRef.current)
+                        trackRef.current.scrollTo({ left: 0 });
+                } catch (e) {}
+            });
         };
 
         compute();
@@ -61,17 +80,21 @@ export default function Carousel({
         return () => clearInterval(autoplayRef.current);
     }, [autoplay, interval, pageIndex, pages]);
 
-    const goToPage = (i) => {
+    // Item-based navigation: move by one item width
+    const goToItem = (i) => {
         const t = trackRef.current;
         if (!t) return;
-        const pageWidth = t.clientWidth;
-        const left = i * pageWidth;
+        const firstChild = t.children[0];
+        const itemWidth = firstChild ? firstChild.clientWidth : t.clientWidth;
+        const clamped = Math.min(Math.max(0, i), Math.max(0, validChildren.length - 1));
+        const left = Math.round(clamped * itemWidth);
         t.scrollTo({ left, behavior: "smooth" });
-        setPageIndex(i);
+        setCurrentIndex(clamped);
+        setPageIndex(Math.floor(clamped / Math.max(1, itemsPerPage)));
     };
 
-    const next = () => goToPage(Math.min(pages - 1, pageIndex + 1));
-    const prev = () => goToPage(Math.max(0, pageIndex - 1));
+    const next = () => goToItem(currentIndex + 1);
+    const prev = () => goToItem(currentIndex - 1);
 
     return (
         <div className={`${className} relative group`}>
