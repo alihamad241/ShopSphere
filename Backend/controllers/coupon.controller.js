@@ -72,12 +72,12 @@ export const createCoupon = async (req, res) => {
         // ensure unique code only (case-insensitive)
         const existing = await Coupon.findOne({ code: { $regex: `^${escapeRegExp(normalizedCode)}$`, $options: "i" } });
         if (existing) {
-            console.warn("createCoupon: duplicate code detected", { normalizedCode, existingId: existing._id, existingCode: existing.code });
+            console.warn("createCoupon: duplicate code detected", { normalizedCode, existingCode: existing.code });
             return res
                 .status(409)
                 .json({
-                    message: "A coupon with this code already exists",
-                    existing: { id: existing._id, code: existing.code, isActive: existing.isActive },
+                    message: "A coupon with this code already exists - 1",
+                    existing: { code: existing.code, isActive: existing.isActive },
                 });
         }
 
@@ -95,7 +95,7 @@ export const createCoupon = async (req, res) => {
             if (saveErr && saveErr.code === 11000) {
                 return res
                     .status(409)
-                    .json({ message: "A coupon with this code already exists", dbError: { code: saveErr.code, keyValue: saveErr.keyValue } });
+                    .json({ message: "A coupon with this code already exists - 2", dbError: { code: saveErr.code, keyValue: saveErr.keyValue } });
             }
             throw saveErr;
         }

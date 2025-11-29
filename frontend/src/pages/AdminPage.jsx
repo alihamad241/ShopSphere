@@ -8,7 +8,6 @@ import Footer from "../components/Footer";
 import AnalyticsTab from "../components/AnalyticsTab";
 import { useProductStore } from "../stores/useProductStore";
 import { useBrandStore } from "../stores/useBrandStore";
-import { useUserStore } from "../stores/useUserStore";
 import { useCouponStore } from "../stores/useCouponStore";
 import toast from "react-hot-toast";
 
@@ -37,7 +36,6 @@ const AdminPage = () => {
     const [storeForm, setStoreForm] = useState({ name: "", description: "", image: "" });
     const [message, setMessage] = useState("");
     const [couponForm, setCouponForm] = useState({ code: "", discountPercentage: 10, isActive: true, expirationDate: "" });
-    const { user } = useUserStore();
 
     useEffect(() => {
         fetchAllProducts();

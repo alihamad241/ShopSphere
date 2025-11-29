@@ -6,10 +6,10 @@ const GiftCouponCard = () => {
     const [userInputCode, setUserInputCode] = useState("");
     const { coupon, isCouponApplied, applyCoupon, getMyCoupon, removeCoupon } = useCouponStore();
 
-    useEffect(() => {
-        getMyCoupon();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // useEffect(() => {
+    //     getMyCoupon();
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     useEffect(() => {
         if (coupon) setUserInputCode(coupon.code);
@@ -48,7 +48,7 @@ const GiftCouponCard = () => {
                 {isCouponApplied && coupon && (
                     <div className="mt-4 text-gray-400">
                         <p>Applied Coupon:</p>
-                        <p className="text-white font-semibold">
+                        <p className="text-black font-semibold">
                             {coupon.code} - {coupon.discountPercentage}% off
                         </p>
                         <button
