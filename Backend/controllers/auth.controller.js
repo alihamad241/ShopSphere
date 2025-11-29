@@ -1,27 +1,19 @@
 import { redis } from "../libs/redis.js";
 import User from "../models/user.model.js";
+import Order from "../models/order.model.js";
 import jwt from "jsonwebtoken";
 
 const generateTokens = (userId) => {
     const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "15m",
     });
-    const refreshToken = jwt.sign(
-        { userId },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "7d" }
-    );
+    const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 
     return { accessToken, refreshToken };
 };
 
 const storeRefreshToken = async (userId, refreshToken) => {
-    await redis.set(
-        `refresh_token:${userId}`,
-        refreshToken,
-        "EX",
-        7 * 24 * 60 * 60
-    );
+    await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7 * 24 * 60 * 60);
 };
 
 const setCookies = (res, accessToken, refreshToken) => {
@@ -45,17 +37,12 @@ export const signup = async (req, res) => {
     try {
         const userExists = await User.findOne({ email });
 
-        if (userExists)
-            return res.status(400).json({ message: "User already exists" });
+        if (userExists) return res.status(400).json({ message: "User already exists" });
 
         const user = await User.create({ name, email, password });
 
         // authenticate
-        const { accessToken, refreshToken } = generateTokens(
-            user._id,
-            200,
-            res
-        );
+        const { accessToken, refreshToken } = generateTokens(user._id, 200, res);
 
         await storeRefreshToken(user._id, refreshToken);
 
@@ -106,10 +93,7 @@ export const logout = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;
         if (refreshToken) {
-            const decoded = jwt.verify(
-                refreshToken,
-                process.env.REFRESH_TOKEN_SECRET
-            );
+            const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
             await redis.del(`refresh_token:${decoded.userId}`);
         }
         res.clearCookie("accessToken");
@@ -129,10 +113,7 @@ export const refreshToken = async (req, res) => {
             return;
         }
 
-        const decoded = jwt.verify(
-            refreshToken,
-            process.env.REFRESH_TOKEN_SECRET
-        );
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
         const storedToken = await redis.get(`refresh_token:${decoded.userId}`);
 
@@ -140,11 +121,7 @@ export const refreshToken = async (req, res) => {
             return res.status(401).json({ message: "Invalid refresh token" });
         }
 
-        const accessToken = jwt.sign(
-            { userId: decoded.userId },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "15m" }
-        );
+        const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
@@ -178,10 +155,7 @@ export const updateProfile = async (req, res) => {
         // If email is changing, ensure it's not already taken
         if (email && email !== user.email) {
             const exists = await User.findOne({ email });
-            if (exists)
-                return res
-                    .status(400)
-                    .json({ message: "Email already in use" });
+            if (exists) return res.status(400).json({ message: "Email already in use" });
             user.email = email;
         }
 
@@ -190,17 +164,11 @@ export const updateProfile = async (req, res) => {
         // If changing password, require currentPassword and verify it
         if (newPassword) {
             if (!currentPassword)
-                return res
-                    .status(400)
-                    .json({
-                        message:
-                            "Current password is required to change password",
-                    });
+                return res.status(400).json({
+                    message: "Current password is required to change password",
+                });
             const isMatch = await user.comparePassword(currentPassword);
-            if (!isMatch)
-                return res
-                    .status(401)
-                    .json({ message: "Current password is incorrect" });
+            if (!isMatch) return res.status(401).json({ message: "Current password is incorrect" });
             user.password = newPassword; // will be hashed by pre-save hook
         }
 
@@ -219,12 +187,21 @@ export const updateProfile = async (req, res) => {
     }
 };
 
-
 export const getOrders = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).populate('orders');
-        res.status(200).json(user.orders);
+        // Query the orders collection for orders belonging to this user. This
+        // is more robust than relying on a denormalized `user.orders` array
+        // which may not be maintained when orders are created via webhooks
+        // or other code paths.
+        const orders = await Order.find({ user: req.user._id })
+            .sort({ date: -1 })
+            .populate({
+                path: "products.product",
+                select: "name price images slug",
+            });
+
+        return res.status(200).json(orders || []);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserStore } from "../stores/useUserStore";
+import { useOrdersStore } from "../stores/useOrdersStore";
 import axios from "../libs/axios";
 import { toast } from "react-hot-toast";
 
@@ -33,6 +34,10 @@ export default function MyAccountDashboard({ onLogout }) {
     const user = useUserStore((s) => s.user);
     const navigate = useNavigate();
     const location = useLocation();
+    const orders = useOrdersStore((s) => s.orders);
+    const ordersLoading = useOrdersStore((s) => s.loading);
+    const ordersError = useOrdersStore((s) => s.error);
+    const fetchOrders = useOrdersStore((s) => s.fetchOrders);
 
     useEffect(() => {
         try {
@@ -61,6 +66,16 @@ export default function MyAccountDashboard({ onLogout }) {
         navigate("/login");
     };
 
+    // fetchOrders comes from useOrdersStore
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
+
+    useEffect(() => {
+        if (activeTab === "orders") fetchOrders();
+    }, [activeTab, fetchOrders]);
+
     return (
         <div className="flex flex-wrap gap-x-8 justify-center mt-14 mb-14 p-6">
             <aside className="lg:w-1/6 w-full">
@@ -70,14 +85,10 @@ export default function MyAccountDashboard({ onLogout }) {
                             key={tab.id}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) =>
-                                e.key === "Enter" && setActiveTab(tab.id)
-                            }
+                            onKeyDown={(e) => e.key === "Enter" && setActiveTab(tab.id)}
                             onClick={() => setActiveTab(tab.id)}
                             className={`transition-all font-bold mb-1 duration-200 cursor-pointer px-4 py-2 rounded ${
-                                tab.id === activeTab
-                                    ? "bg-[#00BBA6] text-white"
-                                    : "bg-white text-gray-700"
+                                tab.id === activeTab ? "bg-[#00BBA6] text-white" : "bg-white text-gray-700"
                             }`}>
                             {tab.label}
                         </li>
@@ -95,39 +106,27 @@ export default function MyAccountDashboard({ onLogout }) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div className="bg-white p-4 rounded-lg shadow-sm">
                             <div className="text-sm text-gray-500">Orders</div>
-                            <div className="mt-2 text-2xl font-bold text-gray-900">
-                                {sampleOrders.length}
-                            </div>
-                            <div className="text-xs text-gray-400 mt-1">
-                                Recent orders placed
-                            </div>
+                            <div className="mt-2 text-2xl font-bold text-gray-900">{orders.length}</div>
+                            <div className="text-xs text-gray-400 mt-1">Recent orders placed</div>
                         </div>
 
                         <div className="bg-white p-4 rounded-lg shadow-sm">
                             <div className="text-sm text-gray-500">Account</div>
-                            <div className="mt-2 text-lg font-semibold text-gray-900">
-                                {user?.name || "-"}
-                            </div>
-                            <div className="text-xs text-gray-400 mt-1">
-                                {user?.email || "-"}
-                            </div>
+                            <div className="mt-2 text-lg font-semibold text-gray-900">{user?.name || "-"}</div>
+                            <div className="text-xs text-gray-400 mt-1">{user?.email || "-"}</div>
                         </div>
 
                         <div className="bg-white p-4 rounded-lg shadow-sm">
                             <div className="text-sm text-gray-500">Actions</div>
                             <div className="mt-2 flex flex-col gap-2">
                                 <button
-                                    onClick={() =>
-                                        setActiveTab("accountDetails")
-                                    }
+                                    onClick={() => setActiveTab("accountDetails")}
                                     className="text-sm px-3 py-2 bg-[#00BBA6] text-white rounded">
                                     Edit account
                                 </button>
                                 <Link
                                     // to="/my-account?tab=orders"
-                                    onClick={() =>
-                                        setActiveTab("orders")
-                                    }
+                                    onClick={() => setActiveTab("orders")}
                                     className="text-sm px-3 py-2 border rounded text-[#00BBA6] text-center">
                                     View orders
                                 </Link>
@@ -139,43 +138,49 @@ export default function MyAccountDashboard({ onLogout }) {
                         <div className="flex items-center justify-between mb-3">
                             <h4 className="font-semibold">Recent Orders</h4>
                             <Link
-                                onClick={() =>
-                                    setActiveTab("orders")
-                                }
+                                onClick={() => setActiveTab("orders")}
                                 className="text-sm text-[#00BBA6] hover:underline">
                                 See all
                             </Link>
                         </div>
 
-                        {sampleOrders.length ? (
+                        {ordersLoading ? (
+                            <div className="text-sm text-gray-500">Loading recent orders…</div>
+                        ) : orders.length ? (
                             <ul className="space-y-3">
-                                {sampleOrders.slice(0, 3).map((o) => (
-                                    <li
-                                        key={o.id}
-                                        className="flex items-center justify-between border rounded p-3">
-                                        <div>
-                                            <div className="font-medium">
-                                                Order {o.id}
+                                {orders.slice(0, 3).map((o) => {
+                                    const id = o._id || o.id;
+                                    const date = o.date
+                                        ? new Date(o.date).toLocaleDateString()
+                                        : o.createdAt
+                                        ? new Date(o.createdAt).toLocaleDateString()
+                                        : "-";
+                                    const total =
+                                        typeof o.totalAmount === "number"
+                                            ? o.totalAmount > 1000
+                                                ? `$${(o.totalAmount / 100).toFixed(2)}`
+                                                : `$${o.totalAmount.toFixed(2)}`
+                                            : o.total || "-";
+                                    return (
+                                        <li
+                                            key={id}
+                                            className="flex items-center justify-between border rounded p-3">
+                                            <div>
+                                                <div className="font-medium">Order {id}</div>
+                                                <div className="text-sm text-gray-500">{date}</div>
                                             </div>
-                                            <div className="text-sm text-gray-500">
-                                                {o.date}
+                                            <div className="text-right">
+                                                <div className="text-sm text-gray-900">{total}</div>
+                                                <div className="text-xs mt-1 inline-flex items-center px-2 py-1 rounded-full bg-green-50 text-green-700">
+                                                    {o.status}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-sm text-gray-900">
-                                                {o.total}
-                                            </div>
-                                            <div className="text-xs mt-1 inline-flex items-center px-2 py-1 rounded-full bg-green-50 text-green-700">
-                                                {o.status}
-                                            </div>
-                                        </div>
-                                    </li>
-                                ))}
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         ) : (
-                            <div className="text-sm text-gray-500">
-                                You have no recent orders.
-                            </div>
+                            <div className="text-sm text-gray-500">You have no recent orders.</div>
                         )}
                     </div>
                 </section>
@@ -184,59 +189,57 @@ export default function MyAccountDashboard({ onLogout }) {
                 <section
                     className={activeTab === "orders" ? "block" : "hidden"}
                     aria-hidden={activeTab !== "orders"}>
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-6">
-                        Orders
-                    </h3>
+                    <h3 className="text-2xl font-semibold text-gray-900 mb-6">Orders</h3>
                     <div className="bg-white w-full shadow-sm ring-1 ring-gray-900/5 rounded-lg overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-x divide-gray-300">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Order
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Total
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y-2 divide-gray-200">
-                                    {sampleOrders.map((order) => (
-                                        <tr
-                                            key={order.id}
-                                            className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {order.id}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                {order.date}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium text-green-700 bg-green-50">
-                                                    {order.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {order.total}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                <Link
-                                                    to={`/orders/${order.id}`}
-                                                    className="inline-flex items-center gap-1.5 text-pink-600 hover:text-pink-700 font-medium">
-                                                    View
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {(ordersLoading ? [] : orders.length ? orders : sampleOrders).map((order) => {
+                                        const id = order._id || order.id;
+                                        const date = order.date
+                                            ? new Date(order.date).toLocaleDateString()
+                                            : order.createdAt
+                                            ? new Date(order.createdAt).toLocaleDateString()
+                                            : "-";
+                                        const status = order.status || "-";
+                                        const total =
+                                            typeof order.totalAmount === "number"
+                                                ? order.totalAmount > 1000
+                                                    ? `$${(order.totalAmount / 100).toFixed(2)}`
+                                                    : `$${order.totalAmount.toFixed(2)}`
+                                                : order.total || "-";
+
+                                        return (
+                                            <tr
+                                                key={id}
+                                                className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{id}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{date}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium text-green-700 bg-green-50">
+                                                        {status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{total}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <Link
+                                                        to={`/orders/${id}`}
+                                                        className="inline-flex items-center gap-1.5 text-pink-600 hover:text-pink-700 font-medium">
+                                                        View
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -245,13 +248,9 @@ export default function MyAccountDashboard({ onLogout }) {
 
                 {/* Account Details */}
                 <section
-                    className={
-                        activeTab === "accountDetails" ? "block" : "hidden"
-                    }
+                    className={activeTab === "accountDetails" ? "block" : "hidden"}
                     aria-hidden={activeTab !== "accountDetails"}>
-                    <h3 className="mb-5 text-2xl font-semibold">
-                        Account Details
-                    </h3>
+                    <h3 className="mb-5 text-2xl font-semibold">Account Details</h3>
                     <AccountDetailsForm user={user} />
                 </section>
 
@@ -260,9 +259,7 @@ export default function MyAccountDashboard({ onLogout }) {
                     className={activeTab === "logout" ? "block" : "hidden"}
                     aria-hidden={activeTab !== "logout"}>
                     <h3 className="mb-5 text-2xl font-semibold">Logout</h3>
-                    <p className="text-gray-700 mb-4">
-                        Click the button below to log out of your account.
-                    </p>
+                    <p className="text-gray-700 mb-4">Click the button below to log out of your account.</p>
                     <div>
                         <button
                             onClick={handleLogout}
@@ -307,9 +304,7 @@ function AccountDetailsForm({ user }) {
     const saveChanges = async () => {
         if (newPassword) {
             if (!currentPassword) {
-                toast.error(
-                    "Enter your current password to change your password"
-                );
+                toast.error("Enter your current password to change your password");
                 return;
             }
             if (newPassword !== confirmPassword) {
@@ -331,8 +326,7 @@ function AccountDetailsForm({ user }) {
             toast.success("Profile updated successfully");
             setEditing(false);
         } catch (err) {
-            const msg =
-                err?.response?.data?.message || "Could not update profile";
+            const msg = err?.response?.data?.message || "Could not update profile";
             toast.error(msg);
         }
     };
@@ -342,20 +336,12 @@ function AccountDetailsForm({ user }) {
             {!editing ? (
                 <div className="space-y-4">
                     <div>
-                        <div className="text-sm font-medium text-gray-700">
-                            Full name
-                        </div>
-                        <div className="mt-1 text-gray-900">
-                            {user?.name || "-"}
-                        </div>
+                        <div className="text-sm font-medium text-gray-700">Full name</div>
+                        <div className="mt-1 text-gray-900">{user?.name || "-"}</div>
                     </div>
                     <div>
-                        <div className="text-sm font-medium text-gray-700">
-                            Email address
-                        </div>
-                        <div className="mt-1 text-gray-900">
-                            {user?.email || "-"}
-                        </div>
+                        <div className="text-sm font-medium text-gray-700">Email address</div>
+                        <div className="mt-1 text-gray-900">{user?.email || "-"}</div>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
@@ -368,9 +354,7 @@ function AccountDetailsForm({ user }) {
             ) : (
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Full name
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Full name</label>
                         <input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -378,9 +362,7 @@ function AccountDetailsForm({ user }) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Email address
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Email address</label>
                         <input
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -388,9 +370,7 @@ function AccountDetailsForm({ user }) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Current password (required to change)
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Current password (required to change)</label>
                         <input
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -399,9 +379,7 @@ function AccountDetailsForm({ user }) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            New password
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">New password</label>
                         <input
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
@@ -410,9 +388,7 @@ function AccountDetailsForm({ user }) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Confirm new password
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Confirm new password</label>
                         <input
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}

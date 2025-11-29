@@ -8,8 +8,9 @@ import axios from "../libs/axios";
 const CartTotals = () => {
     const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
 
-    const savings = subtotal - total;
     const shipping = 15;
+    const discount = coupon && coupon.discountPercentage ? subtotal * (coupon.discountPercentage / 100) : 0;
+    const savings = discount; // display coupon discount as savings
     const formattedShipping = shipping.toFixed(2);
     const formattedSubtotal = subtotal.toFixed(2);
     const formattedTotal = total.toFixed(2);
@@ -66,6 +67,14 @@ const CartTotals = () => {
                     <span className="font-bold">Shipping</span>
                     <span>Flat Rate: ${formattedShipping}</span>
                 </div>
+
+                {/* Discount / Coupon */}
+                {coupon && coupon.discountPercentage ? (
+                    <div className="flex justify-between text-gray-700">
+                        <span className="font-bold">Discount ({coupon.code})</span>
+                        <span className="text-red-600">-${formattedSavings}</span>
+                    </div>
+                ) : null}
 
                 {/* Right-aligned Calculate Shipping above total */}
                 <p className="text-right text-sm text-red-600 cursor-pointer">Calculate shipping</p>
