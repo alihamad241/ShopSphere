@@ -17,7 +17,18 @@ export default function ShopPage() {
         fetchAllProducts();
     }, [fetchAllProducts]);
 
-    const list = products || [];
+    const [sortBy, setSortBy] = useState("default");
+    const list = useMemo(() => {
+        const arr = (products || []).slice();
+        switch (sortBy) {
+            case "name-asc":
+                return arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+            case "name-desc":
+                return arr.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+            default:
+                return arr;
+        }
+    }, [products, sortBy]);
     const location = useLocation();
     const [page, setPage] = useState(1);
     const pageSize = 9;
@@ -110,10 +121,13 @@ export default function ShopPage() {
                                     </div>
                                     <div className="shop_actions flex items-center gap-3">
                                         <label className="text-sm text-gray-600">Sort By:</label>
-                                        <select className="border rounded px-3 py-1">
-                                            <option>Default</option>
-                                            <option>Product Name: A-Z</option>
-                                            <option>Product Name: Z-A</option>
+                                        <select
+                                            value={sortBy}
+                                            onChange={(e) => setSortBy(e.target.value)}
+                                            className="border rounded px-3 py-1">
+                                            <option value="default">Default</option>
+                                            <option value="name-asc">Product Name: A-Z</option>
+                                            <option value="name-desc">Product Name: Z-A</option>
                                         </select>
                                         <div className="view_switch inline-flex items-center">
                                             <RouteViewToggle
