@@ -137,6 +137,17 @@ export const checkoutSuccess = async (req, res) => {
 
             await newOrder.save();
 
+            // Ensure the user's `orders` array contains this order id so
+            // older codepaths that rely on `user.orders` will work.
+            try {
+                const userId = session.metadata.userId;
+                if (userId) {
+                    await User.findByIdAndUpdate(userId, { $push: { orders: newOrder._id } });
+                }
+            } catch (err) {
+                console.error("Failed to push order id to user.orders:", err);
+            }
+
             // Clear the user's cart now that the order was created
             try {
                 const userId = session.metadata.userId || req.user?._id;
@@ -208,6 +219,15 @@ export const stripeWebhook = async (req, res) => {
                 });
 
                 await newOrder.save();
+
+                    try {
+                        const userId = session.metadata.userId;
+                        if (userId) {
+                            await User.findByIdAndUpdate(userId, { $push: { orders: newOrder._id } });
+                        }
+                    } catch (err) {
+                        console.error("Failed to push order id to user.orders (webhook):", err);
+                    }
                 // Clear the user's cart (webhook path)
                 try {
                     const userId = session.metadata.userId;
@@ -276,6 +296,15 @@ export const createOrderFromSession = async (req, res) => {
             });
 
             await newOrder.save();
+
+                try {
+                    const userId = session.metadata.userId;
+                    if (userId) {
+                        await User.findByIdAndUpdate(userId, { $push: { orders: newOrder._id } });
+                    }
+                } catch (err) {
+                    console.error("Failed to push order id to user.orders (createOrderFromSession):", err);
+                }
 
             // Clear the user's cart (createOrderFromSession fallback)
             try {

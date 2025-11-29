@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserStore } from "../stores/useUserStore";
+import { useOrdersStore } from "../stores/useOrdersStore";
 import axios from "../libs/axios";
 import { toast } from "react-hot-toast";
 
@@ -33,9 +34,10 @@ export default function MyAccountDashboard({ onLogout }) {
     const user = useUserStore((s) => s.user);
     const navigate = useNavigate();
     const location = useLocation();
-    const [ordersData, setOrdersData] = useState([]);
-    const [ordersLoading, setOrdersLoading] = useState(false);
-    const [ordersError, setOrdersError] = useState(null);
+    const orders = useOrdersStore((s) => s.orders);
+    const ordersLoading = useOrdersStore((s) => s.loading);
+    const ordersError = useOrdersStore((s) => s.error);
+    const fetchOrders = useOrdersStore((s) => s.fetchOrders);
 
     useEffect(() => {
         try {
@@ -64,30 +66,15 @@ export default function MyAccountDashboard({ onLogout }) {
         navigate("/login");
     };
 
-    // Fetch orders from backend (protected route)
-    const fetchOrders = async () => {
-        setOrdersLoading(true);
-        setOrdersError(null);
-        try {
-            const res = await axios.get("/auth/orders");
-            console.log("Fetched orders:", res.data);
-            setOrdersData(res.data || []);
-        } catch (err) {
-            console.error("Could not load orders", err);
-            setOrdersError(err?.response?.data?.message || err.message || "Failed to load orders");
-            toast.error("Failed to load orders");
-        } finally {
-            setOrdersLoading(false);
-        }
-    };
+    // fetchOrders comes from useOrdersStore
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [fetchOrders]);
 
     useEffect(() => {
         if (activeTab === "orders") fetchOrders();
-    }, [activeTab]);
+    }, [activeTab, fetchOrders]);
 
     return (
         <div className="flex flex-wrap gap-x-8 justify-center mt-14 mb-14 p-6">
@@ -119,7 +106,7 @@ export default function MyAccountDashboard({ onLogout }) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div className="bg-white p-4 rounded-lg shadow-sm">
                             <div className="text-sm text-gray-500">Orders</div>
-                            <div className="mt-2 text-2xl font-bold text-gray-900">{ordersData.length}</div>
+                            <div className="mt-2 text-2xl font-bold text-gray-900">{orders.length}</div>
                             <div className="text-xs text-gray-400 mt-1">Recent orders placed</div>
                         </div>
 
@@ -159,9 +146,9 @@ export default function MyAccountDashboard({ onLogout }) {
 
                         {ordersLoading ? (
                             <div className="text-sm text-gray-500">Loading recent orders…</div>
-                        ) : ordersData.length ? (
+                        ) : orders.length ? (
                             <ul className="space-y-3">
-                                {ordersData.slice(0, 3).map((o) => {
+                                {orders.slice(0, 3).map((o) => {
                                     const id = o._id || o.id;
                                     const date = o.date
                                         ? new Date(o.date).toLocaleDateString()
@@ -216,7 +203,7 @@ export default function MyAccountDashboard({ onLogout }) {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y-2 divide-gray-200">
-                                    {(ordersLoading ? [] : ordersData.length ? ordersData : sampleOrders).map((order) => {
+                                    {(ordersLoading ? [] : orders.length ? orders : sampleOrders).map((order) => {
                                         const id = order._id || order.id;
                                         const date = order.date
                                             ? new Date(order.date).toLocaleDateString()

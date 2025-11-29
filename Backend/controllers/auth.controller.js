@@ -1,5 +1,6 @@
 import { redis } from "../libs/redis.js";
 import User from "../models/user.model.js";
+import Order from "../models/order.model.js";
 import jwt from "jsonwebtoken";
 
 const generateTokens = (userId) => {
@@ -188,19 +189,18 @@ export const updateProfile = async (req, res) => {
 
 export const getOrders = async (req, res) => {
     try {
-        // Use the already-loaded user document from protectRoute and populate orders.
-        // Populate nested products inside each order so the frontend can show item details.
-        await req.user.populate({
-            path: "orders",
-            options: { sort: { date: -1 } },
-            populate: {
+        // Query the orders collection for orders belonging to this user. This
+        // is more robust than relying on a denormalized `user.orders` array
+        // which may not be maintained when orders are created via webhooks
+        // or other code paths.
+        const orders = await Order.find({ user: req.user._id })
+            .sort({ date: -1 })
+            .populate({
                 path: "products.product",
                 select: "name price images slug",
-            },
-        });
+            });
 
-        // Send back the populated orders array
-        return res.status(200).json(req.user.orders || []);
+        return res.status(200).json(orders || []);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
