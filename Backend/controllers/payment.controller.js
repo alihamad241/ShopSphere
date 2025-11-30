@@ -60,7 +60,10 @@ export const createCheckoutSession = async (req, res) => {
         // after checkout instead of the client dev server. You can set `SERVER_URL`
         // in your environment (e.g. http://localhost:5000). If not set, fall back
         // to localhost with the backend PORT.
-        const serverBase = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
+        // const serverBase = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
+        const serverBase = process.env.NODE_ENV === "development"
+            ? `http://localhost:${process.env.PORT || 5000}`
+            : process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
