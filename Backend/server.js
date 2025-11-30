@@ -35,7 +35,7 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 // enable CORS (use CLIENT_URL in .env when available)
-app.use(cors({ origin: process.env.CLIENT_URL || true, credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || true, credentials: true }));
 
 
 
