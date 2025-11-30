@@ -17,18 +17,22 @@ const storeRefreshToken = async (userId, refreshToken) => {
 };
 
 const setCookies = (res, accessToken, refreshToken) => {
-    res.cookie("accessToken", accessToken, {
+    const isProd = process.env.NODE_ENV === "production";
+    const accessOpts = {
         httpOnly: true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: isProd ? "none" : "lax",
+        secure: isProd,
         maxAge: 15 * 60 * 1000,
-    });
-    res.cookie("refreshToken", refreshToken, {
+    };
+    const refreshOpts = {
         httpOnly: true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: isProd ? "none" : "lax",
+        secure: isProd,
         maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    };
+
+    res.cookie("accessToken", accessToken, accessOpts);
+    res.cookie("refreshToken", refreshToken, refreshOpts);
 };
 
 export const signup = async (req, res) => {
@@ -96,8 +100,10 @@ export const logout = async (req, res) => {
             const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
             await redis.del(`refresh_token:${decoded.userId}`);
         }
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+        const isProd = process.env.NODE_ENV === "production";
+        const clearOpts = { httpOnly: true, sameSite: isProd ? "none" : "lax", secure: isProd };
+        res.clearCookie("accessToken", clearOpts);
+        res.clearCookie("refreshToken", clearOpts);
         res.status(200).json({ message: "Logout successful" });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -122,11 +128,11 @@ export const refreshToken = async (req, res) => {
         }
 
         const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-
+        const isProd = process.env.NODE_ENV === "production";
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            sameSite: "strict",
-            secure: process.env.NODE_ENV === "production",
+            sameSite: isProd ? "none" : "lax",
+            secure: isProd,
             maxAge: 15 * 60 * 1000,
         });
 
@@ -193,12 +199,10 @@ export const getOrders = async (req, res) => {
         // is more robust than relying on a denormalized `user.orders` array
         // which may not be maintained when orders are created via webhooks
         // or other code paths.
-        const orders = await Order.find({ user: req.user._id })
-            .sort({ date: -1 })
-            .populate({
-                path: "products.product",
-                select: "name price images slug",
-            });
+        const orders = await Order.find({ user: req.user._id }).sort({ date: -1 }).populate({
+            path: "products.product",
+            select: "name price images slug",
+        });
 
         return res.status(200).json(orders || []);
     } catch (error) {
