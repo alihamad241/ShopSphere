@@ -26,21 +26,38 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
     express.json({
-        limit: '10mb',
+        limit: "10mb",
         verify: (req, _res, buf) => {
             req.rawBody = buf;
-        }
+        },
     })
 );
 
 app.use(express.urlencoded({ extended: true }));
 // enable CORS (use CLIENT_URL in .env when available)
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+// Flexible CORS: support one or more allowed frontend origins via
+// FRONTEND_URLS (comma-separated) or a single FRONTEND_URL env var.
+// If FRONTEND_URLS is not set, fall back to localhost dev URL.
+const rawFrontend = process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:5173";
+const allowedOrigins = rawFrontend
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
-
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // allow requests with no origin (e.g., server-to-server or same-origin)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) return callback(null, true);
+            // For easier debugging in staging, allow requests from the request origin
+            // when FRONTEND_URLS contains '*'
+            if (allowedOrigins.includes("*")) return callback(null, true);
+            return callback(new Error(`CORS policy: origin ${origin} not allowed`));
+        },
+        credentials: true,
+    })
+);
 
 app.use(cookieParser());
 app.use("/api/auth", authRoutes);
@@ -71,8 +88,6 @@ app.use("/api/analytics", analyticsRoutes);
 // app.listen(PORT, () => {
 //     console.log(`Server is running on http://localhost:${PORT}`);
 // });
-
-
 
 connectDB();
 
