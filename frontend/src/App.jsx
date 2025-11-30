@@ -20,6 +20,19 @@ import { Toaster } from "react-hot-toast";
 import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
 import { useEffect } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
+function RedirectToBackendSuccess() {
+    // Vite exposes env vars via import.meta.env. Use VITE_BACKEND_URL if provided.
+    const backend = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_SERVER_URL || window.location.origin;
+    React.useEffect(() => {
+        const qs = window.location.search || '';
+        // Redirect the browser to the backend success page which will finalize the order.
+        window.location.href = `${backend.replace(/\/$/, '')}/purchase-success${qs}`;
+    }, []);
+    return null;
+}
 
 function App() {
     const { user, checkAuth, checkingAuth } = useUserStore();
@@ -93,7 +106,7 @@ function App() {
                     />
                     <Route
                         path="/purchase-success"
-                        element={<PurchaseSuccess />}
+                        element={import.meta.env.PROD ? <RedirectToBackendSuccess /> : <PurchaseSuccess />}
                     />
                     <Route
                         path="/admin"
