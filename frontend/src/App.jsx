@@ -21,7 +21,7 @@ import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
 import { useEffect } from "react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 function RedirectToBackendSuccess() {
     // Vite exposes env vars via import.meta.env. Use VITE_BACKEND_URL if provided.
