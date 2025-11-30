@@ -65,9 +65,12 @@ app.use((req, res, next) => {
     res.sendFile(path.join(buildPath, "index.html"));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+// });
+
+module.exports = app;
+
 
 connectDB();
 
